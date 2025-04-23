@@ -12,3 +12,4 @@ SQLAlchemy
 requests
 protobuf
 google-auth
+scikit-learn

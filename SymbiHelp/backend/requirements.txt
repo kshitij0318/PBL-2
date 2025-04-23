@@ -1,0 +1,14 @@
+Flask
+flask-cors
+Flask-SQLAlchemy
+pandas
+numpy
+google-generativeai
+python-dotenv
+bcrypt
+PyJWT
+psycopg2-binary
+SQLAlchemy
+requests
+protobuf
+google-auth

@@ -210,6 +210,14 @@ def require_auth(f):
         return f(*args, **kwargs)
     return decorated
 
+# Root endpoint
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({
+        'status': 'success',
+        'message': 'Welcome to SymbiHelp API'
+    }), HTTPStatus.OK
+
 # Routes
 @app.route('/register', methods=['POST'])
 def register():
@@ -692,6 +700,40 @@ def get_admin_stats():
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving admin stats: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/admin/users', methods=['GET'])
+@require_auth
+def get_all_users():
+    try:
+        user = User.query.get(request.user_id)
+        if not user or not user.is_admin:
+            logger.warning(f"Unauthorized users list access attempt by user_id {request.user_id}")
+            return jsonify({
+                'status': 'error',
+                'message': 'Unauthorized access'
+            }), HTTPStatus.FORBIDDEN
+
+        users = User.query.all()
+        user_list = [{
+            'id': user.id,
+            'email': user.email,
+            'full_name': user.full_name,
+            'is_admin': user.is_admin,
+            'created_at': user.created_at.isoformat()
+        } for user in users]
+
+        logger.info(f"User list retrieved by admin user_id {request.user_id}")
+        return jsonify({
+            'status': 'success',
+            'users': user_list
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        logger.error(f"Error retrieving user list: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error retrieving user list: {str(e)}'
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
 if __name__ == '__main__':

@@ -99,9 +99,9 @@ class TestScore(db.Model):
     __tablename__ = 'test_scores'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    score = db.Column(db.Integer, nullable=False)
-    total = db.Column(db.Integer, nullable=False)
-    test_date = db.Column(db.DateTime, default=datetime.utcnow)
+    score = db.Column(db.Integer, nullable=False)  # User's achieved score
+    max_score = db.Column(db.Integer, default=15, nullable=False)  # Fixed maximum score of 15
+    test_date = db.Column(db.DateTime, default=datetime.utcnow)  # Date and time of test
     topics = db.Column(db.JSON, nullable=True)
 
     def __repr__(self):
@@ -338,7 +338,7 @@ def login():
                 'id': user.id,
                 'email': user.email,
                 'full_name': user.full_name,
-                'is_admin': user.is_admin  # Added to include admin status
+                'is_admin': user.is_admin
             }
         }), HTTPStatus.OK
 
@@ -546,29 +546,35 @@ def get_test_results():
 def save_test_score():
     try:
         data = request.get_json()
-        if not data or not all(key in data for key in ['score', 'total']):
+        if not data or 'score' not in data:
             return jsonify({
                 'status': 'error',
-                'message': 'Score and total are required'
+                'message': 'Score is required'
+            }), HTTPStatus.BAD_REQUEST
+
+        score = data['score']
+        if not isinstance(score, (int, float)) or score < 0 or score > 15:
+            return jsonify({
+                'status': 'error',
+                'message': 'Score must be a number between 0 and 15'
             }), HTTPStatus.BAD_REQUEST
 
         new_test_score = TestScore(
             user_id=request.user_id,
-            score=data['score'],
-            total=data['total'],
-            topics=data.get('topics', {})
+            score=int(score),  # Convert to integer
+            max_score=15  # Fixed maximum score out of 15
         )
         db.session.add(new_test_score)
         db.session.commit()
 
-        logger.info(f"Test score saved for user_id {request.user_id}")
+        logger.info(f"New test score saved for user_id {request.user_id}: {score}/15 at {new_test_score.test_date.isoformat()}")
         return jsonify({
             'status': 'success',
             'message': 'Test score saved successfully',
             'test_score': {
                 'id': new_test_score.id,
                 'score': new_test_score.score,
-                'total': new_test_score.total,
+                'max_score': new_test_score.max_score,
                 'test_date': new_test_score.test_date.isoformat(),
                 'topics': new_test_score.topics
             }
@@ -576,7 +582,7 @@ def save_test_score():
 
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Error saving test score: {str(e)}")
+        logger.error(f"Error saving test score for user_id {request.user_id}: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error saving test score: {str(e)}'
@@ -591,19 +597,19 @@ def get_test_scores():
         results = [{
             'id': score.id,
             'score': score.score,
-            'total': score.total,
+            'max_score': score.max_score,
             'test_date': score.test_date.isoformat(),
             'topics': score.topics
         } for score in test_scores]
 
-        logger.info(f"Test scores retrieved for user_id {request.user_id}")
+        logger.info(f"Multiple test scores retrieved for user_id {request.user_id}: {len(results)} entries")
         return jsonify({
             'status': 'success',
             'test_scores': results
         }), HTTPStatus.OK
 
     except Exception as e:
-        logger.error(f"Error retrieving test scores: {str(e)}")
+        logger.error(f"Error retrieving test scores for user_id {request.user_id}: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving test scores: {str(e)}'
@@ -683,11 +689,11 @@ def get_admin_stats():
             recent_activity_data.append({
                 'user_name': user.full_name if user else 'Unknown User',
                 'score': activity.score,
-                'total': activity.total,
+                'max_score': activity.max_score,
                 'date': activity.test_date.isoformat()
             })
             
-        logger.info(f"Admin stats retrieved by user_id {request.user_id}")
+        logger.info(f"Admin stats retrieved by user_id {request.user_id} with {total_tests} tests in period {time_period}")
         return jsonify({
             'status': 'success',
             'data': {
@@ -701,7 +707,7 @@ def get_admin_stats():
         }), HTTPStatus.OK
         
     except Exception as e:
-        logger.error(f"Error retrieving admin stats: {str(e)}")
+        logger.error(f"Error retrieving admin stats for user_id {request.user_id}: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving admin stats: {str(e)}'
@@ -735,7 +741,7 @@ def get_all_users():
         }), HTTPStatus.OK
 
     except Exception as e:
-        logger.error(f"Error retrieving user list: {str(e)}")
+        logger.error(f"Error retrieving user list for user_id {request.user_id}: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving user list: {str(e)}'

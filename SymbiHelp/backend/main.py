@@ -11,13 +11,18 @@ import os
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError
 from functools import wraps
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
 
-# Environment variables for production
+# Environment variables
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
@@ -25,10 +30,15 @@ ENV = os.getenv('FLASK_ENV', 'production')  # 'development' or 'production'
 
 # Validate environment variables
 if not all([GEMINI_API_KEY, DATABASE_URL, JWT_SECRET_KEY]):
+    logger.error("Missing environment variables")
     raise Exception("Missing environment variables")
 
 # Configure Gemini API
-genai.configure(api_key=GEMINI_API_KEY)
+try:
+    genai.configure(api_key=GEMINI_API_KEY)
+except Exception as e:
+    logger.error(f"Failed to configure Gemini API: {str(e)}")
+    raise Exception(f"Failed to configure Gemini API: {str(e)}")
 
 app = Flask(__name__)
 
@@ -44,17 +54,21 @@ CORS(app, resources={
     r"/*": {
         "origins": allowed_origins,
         "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
     }
 })
 
-# Configure SQLAlchemy for Render's PostgreSQL
+# Configure SQLAlchemy for Aiven PostgreSQL
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace("postgres://", "postgresql://")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'connect_args': {'sslmode': 'require'}
+}
 
 db = SQLAlchemy(app)
 
-# Models (unchanged)
+# Models
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -100,12 +114,13 @@ try:
     with open('logistic_regression_model.pkl', 'rb') as f:
         model = pickle.load(f)
 except FileNotFoundError as e:
+    logger.error(f"Model or scaler file not found: {str(e)}")
     raise Exception(f"Model or scaler file not found: {str(e)}")
 
 # Risk mapping
 risk_mapping = {0: 'Low Risk', 1: 'High/Mid Risk'}
 
-# Utility function for Gemini recommendation (unchanged)
+# Utility function for Gemini recommendation
 def get_gemini_recommendation(input_data, predicted_risk):
     try:
         model = genai.GenerativeModel('gemini-1.5-pro')
@@ -135,9 +150,10 @@ def get_gemini_recommendation(input_data, predicted_risk):
         response = model.generate_content(formatted_prompt)
         return response.text.strip()
     except Exception as e:
+        logger.error(f"Error generating Gemini recommendation: {str(e)}")
         return f"Error generating recommendation: {str(e)}"
 
-# Utility function for Gemini chatbot (unchanged)
+# Utility function for Gemini chatbot
 def get_gemini_chat_response(query):
     try:
         model = genai.GenerativeModel('gemini-1.5-pro')
@@ -150,6 +166,7 @@ def get_gemini_chat_response(query):
         response = model.generate_content(formatted_prompt)
         return response.text.strip()
     except Exception as e:
+        logger.error(f"Error generating Gemini chat response: {str(e)}")
         return f"Error generating chat response: {str(e)}"
 
 # Initialize database
@@ -157,9 +174,10 @@ def init_database():
     with app.app_context():
         try:
             db.create_all()
-            print("Database tables created successfully")
-        except Exception as e:
-            print(f"Error creating database tables: {str(e)}")
+            logger.info("Database tables created successfully")
+        except OperationalError as e:
+            logger.error(f"Database initialization error: {str(e)}")
+            raise Exception(f"Database initialization error: {str(e)}")
 
 init_database()
 
@@ -228,8 +246,10 @@ def register():
 
         try:
             db.session.commit()
+            logger.info(f"User registered: {email}")
         except IntegrityError:
             db.session.rollback()
+            logger.warning(f"Registration failed: Email already exists - {email}")
             return jsonify({
                 'status': 'error',
                 'message': 'Email already exists'
@@ -250,6 +270,7 @@ def register():
 
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Error registering user: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error registering user: {str(e)}'
@@ -281,12 +302,14 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if not user:
+            logger.warning(f"Login failed: User not found - {email}")
             return jsonify({
                 'status': 'error',
                 'message': 'User not found'
             }), HTTPStatus.UNAUTHORIZED
 
         if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            logger.warning(f"Login failed: Invalid password for {email}")
             return jsonify({
                 'status': 'error',
                 'message': 'Invalid password'
@@ -298,6 +321,7 @@ def login():
             'exp': datetime.utcnow() + timedelta(hours=24)
         }, JWT_SECRET_KEY, algorithm='HS256')
 
+        logger.info(f"User logged in: {email}")
         return jsonify({
             'status': 'success',
             'message': 'Login successful',
@@ -306,6 +330,7 @@ def login():
         }), HTTPStatus.OK
 
     except Exception as e:
+        logger.error(f"Error logging in: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error logging in: {str(e)}'
@@ -331,12 +356,14 @@ def predict_dummy():
         for i, result in enumerate(results):
             result['Predicted_Risk'] = predicted_risks[i]
 
+        logger.info("Dummy predictions generated successfully")
         return jsonify({
             'status': 'success',
             'predictions': results
         }), HTTPStatus.OK
 
     except Exception as e:
+        logger.error(f"Error making dummy predictions: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error making predictions: {str(e)}'
@@ -385,6 +412,7 @@ def predict():
         db.session.add(test_result)
         db.session.commit()
 
+        logger.info(f"Prediction made for user_id {request.user_id}: {risk_level}")
         return jsonify({
             'status': 'success',
             'prediction': risk_level,
@@ -395,6 +423,7 @@ def predict():
 
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Error making prediction: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error making prediction: {str(e)}'
@@ -419,12 +448,14 @@ def chat():
 
         response = get_gemini_chat_response(query)
 
+        logger.info("Chat response generated successfully")
         return jsonify({
             'status': 'success',
             'response': response
         }), HTTPStatus.OK
 
     except Exception as e:
+        logger.error(f"Error processing chat query: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error processing query: {str(e)}'
@@ -450,6 +481,7 @@ def save_test_result():
         db.session.add(new_test_result)
         db.session.commit()
 
+        logger.info(f"Test result saved for user_id {request.user_id}")
         return jsonify({
             'status': 'success',
             'message': 'Test result saved successfully',
@@ -463,6 +495,7 @@ def save_test_result():
 
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Error saving test result: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error saving test result: {str(e)}'
@@ -482,12 +515,14 @@ def get_test_results():
             'details': result.details
         } for result in test_results]
 
+        logger.info(f"Test results retrieved for user_id {request.user_id}")
         return jsonify({
             'status': 'success',
             'test_results': results
         }), HTTPStatus.OK
 
     except Exception as e:
+        logger.error(f"Error retrieving test results: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving test results: {str(e)}'
@@ -513,6 +548,7 @@ def save_test_score():
         db.session.add(new_test_score)
         db.session.commit()
 
+        logger.info(f"Test score saved for user_id {request.user_id}")
         return jsonify({
             'status': 'success',
             'message': 'Test score saved successfully',
@@ -527,6 +563,7 @@ def save_test_score():
 
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Error saving test score: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error saving test score: {str(e)}'
@@ -546,12 +583,14 @@ def get_test_scores():
             'topics': score.topics
         } for score in test_scores]
 
+        logger.info(f"Test scores retrieved for user_id {request.user_id}")
         return jsonify({
             'status': 'success',
             'test_scores': results
         }), HTTPStatus.OK
 
     except Exception as e:
+        logger.error(f"Error retrieving test scores: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving test scores: {str(e)}'
@@ -563,6 +602,7 @@ def get_admin_stats():
     try:
         user = User.query.get(request.user_id)
         if not user or not user.is_admin:
+            logger.warning(f"Unauthorized admin stats access attempt by user_id {request.user_id}")
             return jsonify({
                 'status': 'error',
                 'message': 'Unauthorized access'
@@ -634,6 +674,7 @@ def get_admin_stats():
                 'date': activity.test_date.isoformat()
             })
             
+        logger.info(f"Admin stats retrieved by user_id {request.user_id}")
         return jsonify({
             'status': 'success',
             'data': {
@@ -647,6 +688,7 @@ def get_admin_stats():
         }), HTTPStatus.OK
         
     except Exception as e:
+        logger.error(f"Error retrieving admin stats: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving admin stats: {str(e)}'

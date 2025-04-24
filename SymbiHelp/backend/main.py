@@ -334,7 +334,12 @@ def login():
             'status': 'success',
             'message': 'Login successful',
             'token': token,
-            'user': {'id': user.id, 'email': user.email, 'full_name': user.full_name}
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'full_name': user.full_name,
+                'is_admin': user.is_admin  # Added to include admin status
+            }
         }), HTTPStatus.OK
 
     except Exception as e:

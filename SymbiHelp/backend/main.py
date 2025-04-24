@@ -49,17 +49,10 @@ except Exception as e:
 
 app = Flask(__name__)
 
-# Configure CORS
-allowed_origins = [
-    "https://symbihelp.onrender.com",
-    "https://your-frontend-domain.com"  # Replace with actual frontend URL
-]
-if ENV == 'development':
-    allowed_origins.append("http://localhost:8081")  # Allow localhost for dev
-
+# Configure CORS to allow all origins
 CORS(app, resources={
     r"/*": {
-        "origins": allowed_origins,
+        "origins": "*",  # Allow all origins
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True

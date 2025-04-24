@@ -7,7 +7,8 @@ A comprehensive mobile application designed to support expectant mothers through
 - **Authentication System**
   - Secure user registration and login
   - Profile management
-  - Persistent session handling
+  - Persistent session handling with JWT tokens
+  - Automatic token validation and refresh
 
 - **Labor Comfort Techniques**
   - Breathing exercises (Lamaze)
@@ -17,14 +18,22 @@ A comprehensive mobile application designed to support expectant mothers through
   - Interactive tutorials and demonstrations
 
 - **Health Risk Assessment**
-  - Personalized health risk prediction
-  - Comprehensive health metrics tracking
-  - Evidence-based risk analysis
+  - Personalized health risk prediction using machine learning
+  - Comprehensive health metrics tracking (Age, Blood Pressure, Blood Sugar, etc.)
+  - Evidence-based risk analysis with visual risk meter
+  - Personalized recommendations based on risk level
+  - Historical tracking of predictions
 
 - **Progress Tracking**
   - Assessment tests
   - Progress monitoring
   - Personalized feedback
+  - Visual progress indicators
+
+- **AI-Powered Chat Assistant**
+  - Pregnancy-related questions and answers
+  - Personalized advice based on user data
+  - 24/7 support for common concerns
 
 ## 🛠️ Technical Stack
 
@@ -33,16 +42,21 @@ A comprehensive mobile application designed to support expectant mothers through
   - Expo
   - React Navigation
   - AsyncStorage for local data persistence
+  - React Native SVG for visualizations
+  - Markdown support for formatted text
 
 - **Backend**
-  - Node.js
-  - Express.js
+  - Python Flask
+  - Machine Learning models for risk prediction
   - RESTful API architecture
+  - JWT authentication
+  - SQLite database
 
 - **Authentication**
   - JWT (JSON Web Tokens)
   - Secure password hashing
   - Session management
+  - Token-based API access
 
 ## 📱 Screens
 
@@ -53,12 +67,14 @@ A comprehensive mobile application designed to support expectant mothers through
 
 2. **Main Screens**
    - Home Dashboard
-   - Breathing Techniques
-   - Movement Guide
+   - Breathing Techniques (Lamaze)
+   - Movement Guide (Ball Birthing)
    - Yoga Sessions
    - Shiatsu Techniques
    - Health Risk Prediction
    - Assessment Tests
+   - Chat Assistant
+   - Progress Tracking
 
 ## 🚀 Getting Started
 
@@ -68,6 +84,7 @@ A comprehensive mobile application designed to support expectant mothers through
 - npm or yarn
 - Expo CLI
 - iOS Simulator (for Mac) or Android Studio (for Android development)
+- Python 3.8+ (for backend development)
 
 ### Installation
 
@@ -77,21 +94,35 @@ A comprehensive mobile application designed to support expectant mothers through
    cd pregnancy-labor-app
    ```
 
-2. Install dependencies:
+2. Install frontend dependencies:
    ```bash
+   cd frontend
    npm install
    # or
    yarn install
    ```
 
-3. Start the development server:
+3. Install backend dependencies:
    ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+
+4. Start the backend server:
+   ```bash
+   cd backend
+   python main.py
+   ```
+
+5. Start the frontend development server:
+   ```bash
+   cd frontend
    npm start
    # or
    yarn start
    ```
 
-4. Run on your preferred platform:
+6. Run on your preferred platform:
    ```bash
    # For iOS
    npm run ios
@@ -101,30 +132,59 @@ A comprehensive mobile application designed to support expectant mothers through
 
 ## 🔧 Environment Setup
 
-1. Create a `.env` file in the root directory
+1. Create a `.env` file in the frontend directory
 2. Add the following environment variables:
    ```
-   API_URL=your_backend_api_url
+   API_URL=https://symbihelp.onrender.com
    ```
 
 ## 📦 Project Structure
 
 ```
 PBL-2/
-├── screens/              # Screen components
-├── components/           # Reusable components
-├── utils/               # Utility functions and contexts
-├── assets/             # Images, fonts, and other static files
-├── navigation/         # Navigation configuration
-└── App.js             # Root component
+├── frontend/
+│   ├── screens/              # Screen components
+│   ├── components/           # Reusable components
+│   ├── utils/               # Utility functions and contexts
+│   ├── assets/             # Images, fonts, and other static files
+│   ├── navigation/         # Navigation configuration
+│   └── App.js             # Root component
+├── backend/
+│   ├── main.py            # Main Flask application
+│   ├── models/            # Machine learning models
+│   ├── data/              # Training and test data
+│   └── requirements.txt   # Python dependencies
+└── README.md              # Project documentation
 ```
 
 ## 🔐 Authentication Flow
 
 1. User registration with email and password
 2. Secure login with JWT token generation
-3. Token-based session management
-4. Automatic token refresh mechanism
+3. Token stored in AsyncStorage as part of userInfo object
+4. Token included in Authorization header for all API requests
+5. Automatic token validation on app startup
+6. Secure token-based session management
+
+## 🧠 Health Risk Prediction
+
+The application uses a machine learning model to predict pregnancy health risks based on the following metrics:
+
+- Age
+- Systolic Blood Pressure
+- Diastolic Blood Pressure
+- Blood Sugar Level
+- Body Temperature
+- Heart Rate
+
+The prediction process:
+1. User enters health metrics in the prediction screen
+2. Data is sent to the backend API with authentication
+3. Backend processes the data through the ML model
+4. Risk level is determined (Low, Medium, High)
+5. Personalized recommendations are generated
+6. Results are displayed with a visual risk meter
+7. Prediction history is stored for tracking
 
 ## 🎨 UI/UX Features
 
@@ -132,7 +192,9 @@ PBL-2/
 - Intuitive navigation
 - Responsive design
 - Accessibility support
-- Dark/Light mode support
+- Visual risk indicators
+- Interactive tutorials
+- Progress tracking visualizations
 
 ## 🤝 Contributing
 
@@ -162,6 +224,6 @@ For support, email support@yourdomain.com or create an issue in the repository.
 
 ## 🔄 Updates
 
-- Latest update: [Date]
+- Latest update: April 24, 2024
 - Version: 1.0.0
 - Changelog: See [CHANGELOG.md](CHANGELOG.md)

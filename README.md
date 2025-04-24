@@ -22,7 +22,6 @@ A comprehensive mobile application designed to support expectant mothers through
   - Comprehensive health metrics tracking (Age, Blood Pressure, Blood Sugar, etc.)
   - Evidence-based risk analysis with visual risk meter
   - Personalized recommendations based on risk level
-  - Historical tracking of predictions
 
 - **Progress Tracking**
   - Assessment tests

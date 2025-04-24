@@ -28,10 +28,17 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 ENV = os.getenv('FLASK_ENV', 'production')  # 'development' or 'production'
 
-# Validate environment variables
-if not all([GEMINI_API_KEY, DATABASE_URL, JWT_SECRET_KEY]):
-    logger.error("Missing environment variables")
-    raise Exception("Missing environment variables")
+# Validate environment variables with detailed logging
+missing_vars = []
+if not GEMINI_API_KEY:
+    missing_vars.append('GEMINI_API_KEY')
+if not DATABASE_URL:
+    missing_vars.append('DATABASE_URL')
+if not JWT_SECRET_KEY:
+    missing_vars.append('JWT_SECRET_KEY')
+if missing_vars:
+    logger.error(f"Missing environment variables: {', '.join(missing_vars)}")
+    raise Exception(f"Missing environment variables: {', '.join(missing_vars)}")
 
 # Configure Gemini API
 try:

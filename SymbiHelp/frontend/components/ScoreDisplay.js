@@ -1,7 +1,8 @@
 // src/components/ScoreDisplay.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // For icons
+import { saveScore } from '../utils/ProgressManager';
 
 // Theme colors
 const themeColors = {
@@ -15,7 +16,7 @@ const themeColors = {
   success: '#28a745', // Green for score
 };
 
-const ScoreDisplay = ({ score, total = 15, navigation, onRetake }) => {
+const ScoreDisplay = ({ score, total = 15, navigation, onRetake, topicScores }) => {
   const handleReturnHome = () => {
     // Navigate to the root HomeMain screen and reset the navigation stack
     navigation.reset({

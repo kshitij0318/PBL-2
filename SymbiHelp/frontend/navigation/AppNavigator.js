@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import TestScreen from '../screens/TestScreen';
 import ProgressScreen from '../screens/ProgressScreen';
+import AdminDashboard from '../screens/AdminDashboard';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,13 @@ function AppNavigator() {
         options={{ 
           title: 'Progress History',
           headerBackButtonMenuEnabled: true
+        }}
+      />
+      <Stack.Screen
+        name="AdminDashboard"
+        component={AdminDashboard}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

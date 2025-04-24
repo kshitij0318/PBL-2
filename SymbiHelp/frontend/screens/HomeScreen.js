@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../utils/AuthContext';
+import { useTheme } from '../utils/ThemeContext';
 
 // Theme colors
 const themeColors = {
@@ -26,27 +27,27 @@ const themeColors = {
 // Techniques data
 const techniques = [
   {
-    id: 'breathing',
-    name: 'Breathing',
-    icon: 'heart-outline',
+    id: 'lamaze',
+    name: 'Lamaze Breathing',
+    icon: 'person-outline',
     screen: 'LamazeBreathing',
-    description: 'Learn effective breathing techniques to manage contractions and stay relaxed during labor.',
+    description: 'Master breathing techniques for labor',
     color: '#FF9EAA',
   },
   {
-    id: 'movement',
-    name: 'Movement',
-    icon: 'body-outline',
+    id: 'ball',
+    name: 'Ball Birthing',
+    icon: 'basketball-outline',
     screen: 'BallBirthing',
-    description: 'Discover comfortable positions and movements that can help ease labor pain.',
+    description: 'Use birthing ball exercises for comfort',
     color: '#94B8FF',
   },
   {
     id: 'yoga',
-    name: 'Yoga',
-    icon: 'leaf-outline',
+    name: 'Yoga Birthing',
+    icon: 'body-outline',
     screen: 'YogaBirthing',
-    description: 'Practice gentle yoga poses designed specifically for labor comfort and preparation.',
+    description: 'Practice pregnancy-safe yoga poses',
     color: '#98E5BE',
   },
   {
@@ -54,29 +55,30 @@ const techniques = [
     name: 'Shiatsu',
     icon: 'hand-left-outline',
     screen: 'Shiatsu',
-    description: 'Learn pressure point techniques for pain relief and relaxation during labor.',
+    description: 'Learn pressure point techniques',
     color: '#FFB992',
-  },
-  {
-    id: 'predict',
-    name: 'Health Risk Prediction',
-    icon: 'analytics-outline',
-    screen: 'Predict',
-    description: 'Get a personalized health risk assessment based on your current health metrics.',
-    color: '#7A7FFC',
   },
   {
     id: 'test',
     name: 'Assessment Test',
-    icon: 'checkmark-circle-outline',
+    icon: 'help-circle-outline',
     screen: 'Test',
-    description: 'Take an assessment to track your understanding and progress through the techniques.',
+    description: 'Take a test to assess your knowledge',
     color: '#B292FF',
+  },
+  {
+    id: 'predict',
+    name: 'Risk Prediction',
+    icon: 'analytics-outline',
+    screen: 'Predict',
+    description: 'Predict potential health risks',
+    color: '#7A7FFC',
   },
 ];
 
 export default function HomeScreen({ navigation }) {
   const { userInfo, signOut } = useAuth();
+  const { theme, isDarkMode, toggleTheme } = useTheme();
 
   const handleSignOut = async () => {
     try {
@@ -89,82 +91,63 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView 
-        style={styles.container}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContentContainer}
-      >
-        <View style={styles.header}>
-          <View style={styles.profileSection}>
-            <View style={styles.profileInfo}>
-              <View style={styles.profileImageContainer}>
-                {userInfo?.picture ? (
-                  <Image 
-                    source={{ uri: userInfo.picture }} 
-                    style={styles.profileImage} 
-                  />
-                ) : (
-                  <View style={styles.profileImagePlaceholder}>
-                    <Text style={styles.profileImageText}>
-                      {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : 'U'}
-                    </Text>
-                  </View>
-                )}
-              </View>
-              <View style={styles.profileTextContainer}>
-                <Text style={styles.welcomeText}>Welcome back,</Text>
-                <Text style={styles.userNameText}>
-                  {userInfo?.name || 'User'}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.mainContent}>
-          <View style={styles.headerSection}>
-            <Text style={styles.sectionTitle}>Labor Comfort Techniques</Text>
-            <Text style={styles.sectionDescription}>
-              Explore these evidence-based techniques to help manage labor pain and enhance your birthing experience.
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.lightBackground }]}>
+      <View style={[styles.header, { backgroundColor: theme.headerBackground }]}>
+        <View style={styles.headerRow}>
+          <View style={styles.userSection}>
+            <Ionicons name="person-circle-outline" size={32} color={theme.primary} />
+            <Text style={[styles.welcomeText, { color: theme.darkText }]}>
+              Welcome, {userInfo?.full_name?.split(' ')[0] || userInfo?.email?.split('@')[0] || 'User'}
             </Text>
           </View>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={[styles.iconButton, { backgroundColor: theme.lightPrimary }]}
+              onPress={toggleTheme}
+            >
+              <Ionicons
+                name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
+                size={22}
+                color={theme.primary}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.iconButton, { backgroundColor: theme.lightPrimary }]}
+              onPress={handleSignOut}
+            >
+              <Ionicons name="log-out-outline" size={22} color={theme.primary} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
 
-          <View style={styles.techniquesGrid}>
-            {techniques.map((technique) => (
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.contentContainer}>
+          <Text style={[styles.sectionTitle, { color: theme.darkText }]}>
+            Techniques
+          </Text>
+          <View style={styles.grid}>
+            {techniques.map((item) => (
               <TouchableOpacity
-                key={technique.id}
-                style={styles.techniqueCard}
-                onPress={() => navigation.navigate(technique.screen)}
-                activeOpacity={0.8}
+                key={item.id}
+                style={styles.cardWrapper}
+                onPress={() => navigation.navigate(item.screen)}
+                activeOpacity={0.7}
               >
-                <View style={[styles.cardContent, { backgroundColor: technique.color }]}>
-                  <View style={styles.techniqueIconContainer}>
-                    <Ionicons 
-                      name={technique.icon} 
-                      size={32} 
-                      color={themeColors.white} 
-                    />
+                <View style={[styles.card, { backgroundColor: item.color }]}>
+                  <View style={styles.iconContainer}>
+                    <Ionicons name={item.icon} size={28} color="#FFFFFF" />
                   </View>
-                  <Text style={styles.techniqueName}>
-                    {technique.name}
+                  <Text style={styles.cardTitle}>
+                    {item.name}
                   </Text>
-                  <Text style={styles.techniqueDescription}>
-                    {technique.description}
+                  <Text style={styles.cardDescription}>
+                    {item.description}
                   </Text>
                 </View>
               </TouchableOpacity>
             ))}
           </View>
-
-          <TouchableOpacity
-            style={styles.signOutButton}
-            onPress={handleSignOut}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="log-out-outline" size={20} color={themeColors.white} />
-            <Text style={styles.signOutButtonText}>Sign Out</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -174,148 +157,93 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: themeColors.lightBackground,
-  },
-  container: {
-    flex: 1,
-  },
-  scrollContentContainer: {
-    flexGrow: 1,
   },
   header: {
-    backgroundColor: themeColors.white,
-    paddingTop: 20,
-    paddingBottom: 15,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
-    marginBottom: 20,
   },
-  profileSection: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
   },
-  profileInfo: {
+  userSection: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  profileImageContainer: {
-    marginRight: 12,
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  profileImagePlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: themeColors.lightPrimary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileImageText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: themeColors.primary,
-  },
-  profileTextContainer: {
-    flex: 1,
-  },
   welcomeText: {
-    fontSize: 13,
-    color: themeColors.placeholder,
-    marginBottom: 2,
-  },
-  userNameText: {
     fontSize: 16,
     fontWeight: '600',
-    color: themeColors.darkText,
+    marginLeft: 12,
   },
-  mainContent: {
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  content: {
     flex: 1,
-    paddingHorizontal: 12,
   },
-  headerSection: {
-    marginBottom: 24,
+  contentContainer: {
+    padding: 16,
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: themeColors.darkText,
-    marginBottom: 8,
+    marginBottom: 20,
+    paddingHorizontal: 4,
   },
-  sectionDescription: {
-    fontSize: 14,
-    color: themeColors.placeholder,
-    lineHeight: 20,
-  },
-  techniquesGrid: {
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -6,
-    paddingBottom: 20,
+    marginHorizontal: -8,
   },
-  techniqueCard: {
+  cardWrapper: {
     width: '50%',
-    padding: 6,
-    marginBottom: 12,
+    padding: 8,
   },
-  cardContent: {
+  card: {
     borderRadius: 16,
-    padding: 12,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    aspectRatio: 1,
-    elevation: 2,
+    padding: 16,
+    height: 180,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    elevation: 3,
   },
-  techniqueIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
-    marginTop: 4,
+    marginBottom: 12,
   },
-  techniqueName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: themeColors.white,
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  techniqueDescription: {
-    fontSize: 12,
-    color: themeColors.white,
-    textAlign: 'center',
-    lineHeight: 16,
-    opacity: 0.9,
-    paddingHorizontal: 4,
-  },
-  signOutButton: {
-    backgroundColor: themeColors.primary,
-    borderRadius: 10,
-    padding: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  signOutButtonText: {
-    color: themeColors.white,
+  cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  cardDescription: {
+    fontSize: 13,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    lineHeight: 18,
   },
 });
 

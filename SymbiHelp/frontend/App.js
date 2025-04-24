@@ -9,8 +9,8 @@ import { Ionicons } from '@expo/vector-icons';
 // Screen Imports
 import SignUpScreen from './screens/SignUpScreen';
 import SignInScreen from './screens/SignInScreen';
+import AdminDashboard from './screens/AdminDashboard';
 import HomeScreen from './screens/HomeScreen';
-import EarlyLabor from './screens/EarlyLabor';
 import LamazeBreathing from './screens/LamazeBreathing';
 import BallBirthing from './screens/BallBirthing';
 import YogaBirthing from './screens/YogaBirthing';
@@ -20,17 +20,9 @@ import ProgressScreen from './screens/ProgressScreen';
 import PredictScreen from './screens/PredictScreen';
 import ChatBotScreen from './screens/ChatBotScreen';
 
-// Import AuthProvider
+// Import AuthProvider and ThemeProvider
 import { AuthProvider, useAuth } from './utils/AuthContext';
-
-// Theme Colors
-const themeColors = {
-  primary: '#7A7FFC',
-  lightBackground: '#F0F4FF',
-  white: '#FFFFFF',
-  grey: '#A0A0A0',
-  darkText: '#1E1E1E',
-};
+import { ThemeProvider, useTheme } from './utils/ThemeContext';
 
 // Ignore specific warnings
 LogBox.ignoreLogs([
@@ -45,37 +37,39 @@ const Tab = createBottomTabNavigator();
 
 // Loading component
 function LoadingScreen() {
+  const { theme } = useTheme();
   return (
-    <SafeAreaView style={styles.loadingContainer}>
-      <ActivityIndicator size={36} color={themeColors.primary} />
-      <Text style={styles.loadingText}>Loading...</Text>
+    <SafeAreaView style={[styles.loadingContainer, { backgroundColor: theme.lightBackground }]}>
+      <ActivityIndicator size={36} color={theme.primary} />
+      <Text style={[styles.loadingText, { color: theme.text }]}>Loading...</Text>
     </SafeAreaView>
   );
 }
 
 // Stack Navigator for screens reachable from Home tab
 function HomeStackNavigator() {
+  const { theme } = useTheme();
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: themeColors.primary,
+          backgroundColor: theme.primary,
         },
-        headerTintColor: themeColors.white,
+        headerTintColor: theme.white,
         headerTitleStyle: {
           fontWeight: '600',
           fontSize: 18,
         },
         headerBackTitleVisible: false,
         contentStyle: {
-          backgroundColor: themeColors.lightBackground,
+          backgroundColor: theme.lightBackground,
         },
         headerShadowVisible: false,
         headerBackVisible: true,
         headerBackTitle: '',
         headerBackImageSource: null,
         headerBackImage: () => (
-          <Ionicons name="chevron-back" size={24} color={themeColors.white} />
+          <Ionicons name="chevron-back" size={24} color={theme.white} />
         ),
         animation: 'slide_from_right',
         animationDuration: 200,
@@ -91,7 +85,7 @@ function HomeStackNavigator() {
         freezeOnBlur: true,
         screenOrientation: 'portrait',
         statusBarAnimation: 'fade',
-        statusBarColor: themeColors.primary,
+        statusBarColor: theme.primary,
         statusBarStyle: 'light',
         statusBarTranslucent: true,
         statusBarHidden: false,
@@ -104,17 +98,6 @@ function HomeStackNavigator() {
           title: 'Guide',
           headerTitleStyle: {
             fontSize: 20,
-            fontWeight: '600',
-          }
-        }} 
-      />
-      <Stack.Screen 
-        name="EarlyLabor" 
-        component={EarlyLabor} 
-        options={{ 
-          title: 'Early Labor',
-          headerTitleStyle: {
-            fontSize: 18,
             fontWeight: '600',
           }
         }} 
@@ -164,21 +147,19 @@ function HomeStackNavigator() {
         }} 
       />
       <Stack.Screen 
-        name="Predict" 
-        component={PredictScreen} 
-        options={{ 
-          title: 'Health Risk Prediction',
-          headerTitleStyle: {
-            fontSize: 18,
-            fontWeight: '600',
-          }
-        }} 
-      />
-      <Stack.Screen 
         name="Test" 
         component={TestScreen} 
         options={{ 
-          title: 'Assessment Test',
+          title: 'Assessment',
+          presentation: 'modal',
+          animation: 'slide_from_bottom'
+        }} 
+      />
+      <Stack.Screen 
+        name="Predict" 
+        component={PredictScreen} 
+        options={{ 
+          title: 'Risk Prediction',
           headerTitleStyle: {
             fontSize: 18,
             fontWeight: '600',
@@ -191,6 +172,7 @@ function HomeStackNavigator() {
 
 // Main Bottom Tab Navigator
 function MainTabNavigator() {
+  const { theme } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -206,11 +188,11 @@ function MainTabNavigator() {
           }
           return <Ionicons name={iconName} size={24} color={color} />;
         },
-        tabBarActiveTintColor: themeColors.primary,
-        tabBarInactiveTintColor: themeColors.grey,
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.secondaryText,
         tabBarStyle: {
-          backgroundColor: themeColors.white,
-          borderTopColor: 'transparent',
+          backgroundColor: theme.white,
+          borderTopColor: theme.cardBorder,
           paddingBottom: Platform.OS === 'ios' ? 5 : 0,
           height: Platform.OS === 'ios' ? 90 : 60,
         },
@@ -242,10 +224,13 @@ function MainTabNavigator() {
 // Navigation component that handles auth state
 function Navigation() {
   const { userInfo, loading } = useAuth();
+  const { theme } = useTheme();
 
   if (loading) {
     return <LoadingScreen />;
   }
+
+  console.log('[App.js Navigation] UserInfo:', userInfo);
 
   return (
     <NavigationContainer>
@@ -254,7 +239,7 @@ function Navigation() {
           screenOptions={{ 
             headerShown: false,
             contentStyle: {
-              backgroundColor: themeColors.lightBackground,
+              backgroundColor: theme.lightBackground,
             },
             animation: 'slide_from_right',
             animationDuration: 200,
@@ -270,7 +255,7 @@ function Navigation() {
             freezeOnBlur: true,
             screenOrientation: 'portrait',
             statusBarAnimation: 'fade',
-            statusBarColor: themeColors.primary,
+            statusBarColor: theme.primary,
             statusBarStyle: 'light',
             statusBarTranslucent: true,
             statusBarHidden: false,
@@ -281,6 +266,8 @@ function Navigation() {
               <Stack.Screen name="SignIn" component={SignInScreen} />
               <Stack.Screen name="SignUp" component={SignUpScreen} />
             </>
+          ) : userInfo.is_admin === true ? (
+            <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
           ) : (
             <Stack.Screen name="MainApp" component={MainTabNavigator} />
           )}
@@ -290,12 +277,14 @@ function Navigation() {
   );
 }
 
-// Main App Component
+// Main App component
 export default function App() {
   return (
-    <AuthProvider>
-      <Navigation />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Navigation />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
@@ -304,11 +293,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: themeColors.lightBackground,
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: themeColors.darkText,
   },
 });

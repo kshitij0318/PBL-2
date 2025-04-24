@@ -95,8 +95,17 @@ export default function YogaBirthing({ navigation }) {
 
   return (
     <View style={styles.mainContainer}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => navigation.navigate('HomeMain')}
+        >
+          <Ionicons name="arrow-back" size={24} color="#2e7d32" />
+        </TouchableOpacity>
         <Text style={styles.title}>Yoga During the Birthing Process</Text>
+      </View>
+      
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <Text style={styles.description}>
           Yoga can help ease discomfort, promote relaxation, and encourage optimal fetal positioning during labor.
           Below are key yoga poses beneficial for the birthing process.
@@ -119,35 +128,31 @@ export default function YogaBirthing({ navigation }) {
           </View>
         ))}
 
-        {/* Download Button */}
-        <TouchableOpacity 
-          style={styles.downloadButton} 
-          onPress={handleDownload}
-          disabled={downloading}
-        >
-          <Ionicons name="document-text-outline" size={24} color="#fff" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>
-            {downloading ? 'Opening...' : 'Download PDF'}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          {/* Download Button */}
+          <TouchableOpacity 
+            style={styles.downloadButton} 
+            onPress={handleDownload}
+            disabled={downloading}
+          >
+            <Ionicons name="document-text-outline" size={24} color="#fff" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>
+              {downloading ? 'Opening...' : 'Download PDF'}
+            </Text>
+          </TouchableOpacity>
 
-        {/* Video Button */}
-        <TouchableOpacity 
-          style={styles.videoButton} 
-          onPress={handleVideoOpen}
-          disabled={videoLoading}
-        >
-          <Ionicons name="play-circle-outline" size={24} color="#fff" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>
-            {videoLoading ? 'Opening...' : 'Watch Demonstration Video'}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Back to Home Button */}
-        <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="home-outline" size={24} color="#fff" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Back to Home</Text>
-        </TouchableOpacity>
+          {/* Video Button */}
+          <TouchableOpacity 
+            style={styles.videoButton} 
+            onPress={handleVideoOpen}
+            disabled={videoLoading}
+          >
+            <Ionicons name="play-circle-outline" size={24} color="#fff" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>
+              {videoLoading ? 'Opening...' : 'Watch Demonstration Video'}
+            </Text>
+          </TouchableOpacity>
+        </View>
         
         {/* Extra padding view to ensure content is visible */}
         <View style={styles.bottomSpacer} />
@@ -162,6 +167,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#e8f5e9', // Light green background
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 40,
+    paddingBottom: 10,
+    backgroundColor: '#e8f5e9',
+  },
+  backButton: {
+    padding: 10,
+    marginRight: 10,
+  },
   container: {
     flex: 1,
   },
@@ -172,13 +189,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 15,
     color: '#1b5e20', // Darker green
     letterSpacing: 0.5,
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
+    flex: 1,
   },
   description: {
     fontSize: 16,
@@ -238,23 +254,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 15,
   },
-  homeButton: {
-    marginTop: 10,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: '#dc3545',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    marginHorizontal: 20,
-    flexDirection: 'row',
+  buttonContainer: {
+    marginVertical: 20,
   },
   downloadButton: {
-    marginVertical: 20,
+    marginVertical: 10,
     height: 54,
     borderRadius: 27,
     backgroundColor: '#4CAF50',
@@ -269,7 +273,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   videoButton: {
-    marginVertical: 20,
+    marginVertical: 10,
     height: 54,
     borderRadius: 27,
     backgroundColor: '#2196F3',

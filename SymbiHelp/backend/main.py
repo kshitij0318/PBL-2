@@ -12,20 +12,19 @@ import bcrypt
 import jwt
 from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError
+from functools import wraps
 
 # Load environment variables
 load_dotenv()
+
+# Environment variables for production
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-DB_HOST = os.getenv('DB_HOST')
-DB_PORT = os.getenv('DB_PORT')
-DB_NAME = os.getenv('DB_NAME')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_SSL_MODE = os.getenv('DB_SSL_MODE')
+DATABASE_URL = os.getenv('DATABASE_URL')
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+ENV = os.getenv('FLASK_ENV', 'production')  # 'development' or 'production'
 
 # Validate environment variables
-if not all([GEMINI_API_KEY, DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, DB_SSL_MODE, JWT_SECRET_KEY]):
+if not all([GEMINI_API_KEY, DATABASE_URL, JWT_SECRET_KEY]):
     raise Exception("Missing environment variables")
 
 # Configure Gemini API
@@ -33,19 +32,29 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 app = Flask(__name__)
 
-# Enable CORS for all routes
-CORS(app, resources={r"/*": {"origins": "*"}})
+# Configure CORS
+allowed_origins = [
+    "https://symbihelp.onrender.com",
+    "https://your-frontend-domain.com"  # Replace with actual frontend URL
+]
+if ENV == 'development':
+    allowed_origins.append("http://localhost:8081")  # Allow localhost for dev
 
-# Configure SQLAlchemy for Aiven PostgreSQL
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    f"?sslmode={DB_SSL_MODE}&sslrootcert=ca.pem"
-)
+CORS(app, resources={
+    r"/*": {
+        "origins": allowed_origins,
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
+
+# Configure SQLAlchemy for Render's PostgreSQL
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace("postgres://", "postgresql://")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Define User model
+# Models (unchanged)
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -53,9 +62,36 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     full_name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False)
+    test_results = db.relationship('TestResult', backref='user', lazy=True)
+    test_scores = db.relationship('TestScore', backref='user', lazy=True)
 
     def __repr__(self):
         return f"<User {self.email}>"
+
+class TestResult(db.Model):
+    __tablename__ = 'test_results'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    score = db.Column(db.Float, nullable=False)
+    test_date = db.Column(db.DateTime, default=datetime.utcnow)
+    risk_level = db.Column(db.String(50), nullable=False)
+    details = db.Column(db.JSON, nullable=True)
+
+    def __repr__(self):
+        return f"<TestResult {self.id} for User {self.user_id}>"
+
+class TestScore(db.Model):
+    __tablename__ = 'test_scores'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    total = db.Column(db.Integer, nullable=False)
+    test_date = db.Column(db.DateTime, default=datetime.utcnow)
+    topics = db.Column(db.JSON, nullable=True)
+
+    def __repr__(self):
+        return f"<TestScore {self.id} for User {self.user_id}>"
 
 # Load the scaler and model
 try:
@@ -69,7 +105,7 @@ except FileNotFoundError as e:
 # Risk mapping
 risk_mapping = {0: 'Low Risk', 1: 'High/Mid Risk'}
 
-# Utility function for Gemini recommendation
+# Utility function for Gemini recommendation (unchanged)
 def get_gemini_recommendation(input_data, predicted_risk):
     try:
         model = genai.GenerativeModel('gemini-1.5-pro')
@@ -101,7 +137,7 @@ def get_gemini_recommendation(input_data, predicted_risk):
     except Exception as e:
         return f"Error generating recommendation: {str(e)}"
 
-# Utility function for Gemini chatbot
+# Utility function for Gemini chatbot (unchanged)
 def get_gemini_chat_response(query):
     try:
         model = genai.GenerativeModel('gemini-1.5-pro')
@@ -116,59 +152,47 @@ def get_gemini_chat_response(query):
     except Exception as e:
         return f"Error generating chat response: {str(e)}"
 
-# Initialize and seed database
-def seed_database():
+# Initialize database
+def init_database():
     with app.app_context():
-        # Create tables
         try:
             db.create_all()
             print("Database tables created successfully")
         except Exception as e:
             print(f"Error creating database tables: {str(e)}")
-            return
 
-        # Check if users table is empty
-        if not User.query.first():
-            # Dummy users
-            dummy_users = [
-                {
-                    'email': 'alice@example.com',
-                    'password': 'password123',
-                    'full_name': 'Alice Smith'
-                },
-                {
-                    'email': 'bob@example.com',
-                    'password': 'secure456',
-                    'full_name': 'Bob Johnson'
-                },
-                {
-                    'email': 'carol@example.com',
-                    'password': 'mypassword789',
-                    'full_name': 'Carol Williams'
-                }
-            ]
-            
-            for user_data in dummy_users:
-                hashed_password = bcrypt.hashpw(
-                    user_data['password'].encode('utf-8'), bcrypt.gensalt()
-                ).decode('utf-8')
-                user = User(
-                    email=user_data['email'],
-                    password=hashed_password,
-                    full_name=user_data['full_name']
-                )
-                db.session.add(user)
-            
-            try:
-                db.session.commit()
-                print("Dummy users seeded successfully")
-            except Exception as e:
-                db.session.rollback()
-                print(f"Error seeding dummy users: {str(e)}")
+init_database()
 
-# Call seeding function at startup
-seed_database()
+# Authentication decorator to handle OPTIONS requests
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.method == 'OPTIONS':
+            return jsonify({}), HTTPStatus.OK  # Allow preflight requests
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({
+                'status': 'error',
+                'message': 'Authorization token is required'
+            }), HTTPStatus.UNAUTHORIZED
+        token = auth_header.split(' ')[1]
+        try:
+            payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=['HS256'])
+            request.user_id = payload['user_id']
+        except jwt.ExpiredSignatureError:
+            return jsonify({
+                'status': 'error',
+                'message': 'Token has expired'
+            }), HTTPStatus.UNAUTHORIZED
+        except jwt.InvalidTokenError:
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid token'
+            }), HTTPStatus.UNAUTHORIZED
+        return f(*args, **kwargs)
+    return decorated
 
+# Routes
 @app.route('/register', methods=['POST'])
 def register():
     try:
@@ -183,7 +207,6 @@ def register():
         password = data['password']
         full_name = data['full_name']
 
-        # Validate inputs
         if not isinstance(email, str) or not isinstance(password, str) or not isinstance(full_name, str):
             return jsonify({
                 'status': 'error',
@@ -195,11 +218,12 @@ def register():
                 'message': 'Inputs cannot be empty'
             }), HTTPStatus.BAD_REQUEST
 
-        # Hash the password
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-        # Create new user
-        new_user = User(email=email, password=hashed_password, full_name=full_name)
+        new_user = User(
+            email=email,
+            password=hashed_password,
+            full_name=full_name
+        )
         db.session.add(new_user)
 
         try:
@@ -211,7 +235,6 @@ def register():
                 'message': 'Email already exists'
             }), HTTPStatus.BAD_REQUEST
 
-        # Generate JWT
         token = jwt.encode({
             'user_id': new_user.id,
             'email': new_user.email,
@@ -245,7 +268,6 @@ def login():
         email = data['email']
         password = data['password']
 
-        # Validate inputs
         if not isinstance(email, str) or not isinstance(password, str):
             return jsonify({
                 'status': 'error',
@@ -257,7 +279,6 @@ def login():
                 'message': 'Inputs cannot be empty'
             }), HTTPStatus.BAD_REQUEST
 
-        # Find user
         user = User.query.filter_by(email=email).first()
         if not user:
             return jsonify({
@@ -265,14 +286,12 @@ def login():
                 'message': 'User not found'
             }), HTTPStatus.UNAUTHORIZED
 
-        # Verify password
         if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
             return jsonify({
                 'status': 'error',
                 'message': 'Invalid password'
             }), HTTPStatus.UNAUTHORIZED
 
-        # Generate JWT
         token = jwt.encode({
             'user_id': user.id,
             'email': user.email,
@@ -324,52 +343,58 @@ def predict_dummy():
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route('/predict', methods=['POST'])
+@require_auth
 def predict():
     try:
         data = request.get_json()
         if not data:
             return jsonify({
                 'status': 'error',
-                'message': 'No input data provided'
+                'message': 'No data provided'
             }), HTTPStatus.BAD_REQUEST
 
-        required_features = ['Age', 'SystolicBP', 'DiastolicBP', 'BS', 'BodyTemp', 'HeartRate']
-        if not all(feature in data for feature in required_features):
-            return jsonify({
-                'status': 'error',
-                'message': f'Missing required features: {required_features}'
-            }), HTTPStatus.BAD_REQUEST
+        features = [
+            float(data.get('Age', 0)),
+            float(data.get('SystolicBP', 0)),
+            float(data.get('DiastolicBP', 0)),
+            float(data.get('BS', 0)),
+            float(data.get('BodyTemp', 0)),
+            float(data.get('HeartRate', 0))
+        ]
 
-        input_data = pd.DataFrame([{
-            'Age': float(data['Age']),
-            'SystolicBP': float(data['SystolicBP']),
-            'DiastolicBP': float(data['DiastolicBP']),
-            'BS': float(data['BS']),
-            'BodyTemp': float(data['BodyTemp']),
-            'HeartRate': float(data['HeartRate'])
-        }])
+        scaled_features = scaler.transform([features])
+        prediction = model.predict(scaled_features)[0]
+        probability = model.predict_proba(scaled_features)[0][1]
+        risk_level = risk_mapping[prediction]
 
-        input_data_scaled = scaler.transform(input_data)
-        prediction = model.predict(input_data_scaled)[0]
-        predicted_risk = risk_mapping[prediction]
+        recommendation = get_gemini_recommendation(data, risk_level)
 
-        recommendation = get_gemini_recommendation(data, predicted_risk)
+        test_result = TestResult(
+            user_id=request.user_id,
+            score=float(probability * 100),
+            risk_level=risk_level,
+            details={
+                'age': features[0],
+                'systolic_bp': features[1],
+                'diastolic_bp': features[2],
+                'blood_sugar': features[3],
+                'body_temp': features[4],
+                'heart_rate': features[5]
+            }
+        )
+        db.session.add(test_result)
+        db.session.commit()
 
         return jsonify({
             'status': 'success',
-            'prediction': {
-                'input': data,
-                'Predicted_Risk': predicted_risk,
-                'Recommendation': recommendation
-            }
+            'prediction': risk_level,
+            'probability': float(probability * 100),
+            'recommendation': recommendation,
+            'test_result_id': test_result.id
         }), HTTPStatus.OK
 
-    except ValueError as ve:
-        return jsonify({
-            'status': 'error',
-            'message': f'Invalid input data format: {str(ve)}'
-        }), HTTPStatus.BAD_REQUEST
     except Exception as e:
+        db.session.rollback()
         return jsonify({
             'status': 'error',
             'message': f'Error making prediction: {str(e)}'
@@ -405,5 +430,228 @@ def chat():
             'message': f'Error processing query: {str(e)}'
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
+@app.route('/test-results', methods=['POST'])
+@require_auth
+def save_test_result():
+    try:
+        data = request.get_json()
+        if not data or not all(key in data for key in ['score', 'risk_level']):
+            return jsonify({
+                'status': 'error',
+                'message': 'Score and risk_level are required'
+            }), HTTPStatus.BAD_REQUEST
+
+        new_test_result = TestResult(
+            user_id=request.user_id,
+            score=data['score'],
+            risk_level=data['risk_level'],
+            details=data.get('details', {})
+        )
+        db.session.add(new_test_result)
+        db.session.commit()
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Test result saved successfully',
+            'test_result': {
+                'id': new_test_result.id,
+                'score': new_test_result.score,
+                'test_date': new_test_result.test_date.isoformat(),
+                'risk_level': new_test_result.risk_level
+            }
+        }), HTTPStatus.CREATED
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': f'Error saving test result: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/test-results', methods=['GET'])
+@require_auth
+def get_test_results():
+    try:
+        test_results = TestResult.query.filter_by(user_id=request.user_id).order_by(TestResult.test_date.desc()).all()
+        
+        results = [{
+            'id': result.id,
+            'score': result.score,
+            'test_date': result.test_date.isoformat(),
+            'risk_level': result.risk_level,
+            'details': result.details
+        } for result in test_results]
+
+        return jsonify({
+            'status': 'success',
+            'test_results': results
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error retrieving test results: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/test-scores', methods=['POST'])
+@require_auth
+def save_test_score():
+    try:
+        data = request.get_json()
+        if not data or not all(key in data for key in ['score', 'total']):
+            return jsonify({
+                'status': 'error',
+                'message': 'Score and total are required'
+            }), HTTPStatus.BAD_REQUEST
+
+        new_test_score = TestScore(
+            user_id=request.user_id,
+            score=data['score'],
+            total=data['total'],
+            topics=data.get('topics', {})
+        )
+        db.session.add(new_test_score)
+        db.session.commit()
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Test score saved successfully',
+            'test_score': {
+                'id': new_test_score.id,
+                'score': new_test_score.score,
+                'total': new_test_score.total,
+                'test_date': new_test_score.test_date.isoformat(),
+                'topics': new_test_score.topics
+            }
+        }), HTTPStatus.CREATED
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': f'Error saving test score: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/test-scores', methods=['GET'])
+@require_auth
+def get_test_scores():
+    try:
+        test_scores = TestScore.query.filter_by(user_id=request.user_id).order_by(TestScore.test_date.desc()).all()
+        
+        results = [{
+            'id': score.id,
+            'score': score.score,
+            'total': score.total,
+            'test_date': score.test_date.isoformat(),
+            'topics': score.topics
+        } for score in test_scores]
+
+        return jsonify({
+            'status': 'success',
+            'test_scores': results
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error retrieving test scores: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/admin/stats', methods=['GET'])
+@require_auth
+def get_admin_stats():
+    try:
+        user = User.query.get(request.user_id)
+        if not user or not user.is_admin:
+            return jsonify({
+                'status': 'error',
+                'message': 'Unauthorized access'
+            }), HTTPStatus.FORBIDDEN
+
+        total_users = User.query.count()
+        time_period = request.args.get('period', 'week')
+        now = datetime.utcnow()
+        
+        if time_period == 'week':
+            start_date = now - timedelta(days=7)
+        elif time_period == 'month':
+            start_date = now - timedelta(days=30)
+        elif time_period == 'year':
+            start_date = now - timedelta(days=365)
+        else:
+            start_date = now - timedelta(days=7)
+            
+        test_scores = TestScore.query.filter(TestScore.test_date >= start_date).all()
+        if test_scores:
+            avg_score = sum(score.score for score in test_scores) / len(test_scores)
+            total_tests = len(test_scores)
+        else:
+            avg_score = 0
+            total_tests = 0
+            
+        topic_performance = {
+            'Ball Birthing': 0,
+            'Shiatsu': 0,
+            'Yoga Techniques': 0,
+            'Lamaze Breathing': 0
+        }
+        
+        test_scores_with_topics = TestScore.query.filter(
+            TestScore.test_date >= start_date,
+            TestScore.topics.isnot(None)
+        ).all()
+        
+        if test_scores_with_topics:
+            topic_counts = {
+                'Ball Birthing': 0,
+                'Shiatsu': 0,
+                'Yoga Techniques': 0,
+                'Lamaze Breathing': 0
+            }
+            
+            for score in test_scores_with_topics:
+                if score.topics:
+                    for topic, topic_score in score.topics.items():
+                        if topic in topic_performance:
+                            topic_performance[topic] += topic_score
+                            topic_counts[topic] += 1
+            
+            for topic in topic_performance:
+                if topic_counts[topic] > 0:
+                    topic_performance[topic] = round(topic_performance[topic] / topic_counts[topic], 2)
+                else:
+                    topic_performance[topic] = 0
+            
+        recent_activity = TestScore.query.order_by(TestScore.test_date.desc()).limit(5).all()
+        recent_activity_data = []
+        
+        for activity in recent_activity:
+            user = User.query.get(activity.user_id)
+            recent_activity_data.append({
+                'user_name': user.full_name if user else 'Unknown User',
+                'score': activity.score,
+                'total': activity.total,
+                'date': activity.test_date.isoformat()
+            })
+            
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'total_users': total_users,
+                'average_score': round(avg_score, 2),
+                'total_tests': total_tests,
+                'time_period': time_period,
+                'topic_performance': topic_performance,
+                'recent_activity': recent_activity_data
+            }
+        }), HTTPStatus.OK
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error retrieving admin stats: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=ENV == 'development')

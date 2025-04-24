@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle, Path } from 'react-native-svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../utils/config';
 
 // Theme colors
 const themeColors = {
@@ -116,6 +118,7 @@ export default function PredictScreen({ navigation }) {
 
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -140,10 +143,28 @@ export default function PredictScreen({ navigation }) {
 
     setLoading(true);
     try {
-      const response = await fetch('http://127.0.0.1:5000/predict', {
+      // Get the user info from AsyncStorage
+      const userInfoString = await AsyncStorage.getItem('userInfo');
+      if (!userInfoString) {
+        Alert.alert('Error', 'You need to be logged in to use this feature');
+        setLoading(false);
+        return;
+      }
+      
+      const userInfo = JSON.parse(userInfoString);
+      const token = userInfo.token;
+      
+      if (!token) {
+        Alert.alert('Error', 'Authentication token is missing. Please log in again.');
+        setLoading(false);
+        return;
+      }
+      
+      const response = await fetch(`${API_URL}/predict`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           ...formData,
@@ -163,7 +184,27 @@ export default function PredictScreen({ navigation }) {
       const data = await response.json();
       
       if (data.status === 'success' && data.prediction) {
-        setPrediction(data.prediction);
+        // Store the prediction data in the correct format
+        setPrediction({
+          Predicted_Risk: data.prediction,
+          Recommendation: data.recommendation || 'No recommendations available'
+        });
+        
+        // Show success message with recommendation
+        Alert.alert(
+          'Prediction Complete',
+          `Risk Level: ${data.prediction}\n\n${data.recommendation || 'No recommendations available'}`,
+          [
+            {
+              text: 'View History',
+              onPress: () => navigation.navigate('Progress')
+            },
+            {
+              text: 'OK',
+              style: 'cancel'
+            }
+          ]
+        );
       } else {
         Alert.alert('Error', data.message || 'Failed to get prediction');
       }
@@ -285,7 +326,9 @@ export default function PredictScreen({ navigation }) {
               </Text>
             </View>
             <Text style={styles.recommendationTitle}>Recommendations:</Text>
-            <Text style={styles.recommendationText}>{prediction.Recommendation || 'No recommendations available'}</Text>
+            <Text style={styles.recommendationText}>
+              {prediction.Recommendation}
+            </Text>
           </View>
         )}
       </View>

@@ -72,49 +72,52 @@ const BallBirthing = ({ navigation }) => {
     ];
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.heading}>Ball Birthing Techniques</Text>
-            <Text style={styles.subheading}>
-                A powerful, natural way to enhance comfort, relaxation, and labor progression while effectively managing pain.
-            </Text>
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity 
+                    style={styles.backButton} 
+                    onPress={() => navigation.navigate('HomeMain')}
+                >
+                    <Ionicons name="arrow-back" size={24} color="#2e7d32" />
+                </TouchableOpacity>
+                <Text style={styles.heading}>Ball Birthing Techniques</Text>
+            </View>
             
-            {steps.map((step, index) => (
-                <View key={index} style={styles.stepContainer}>
-                    <Text style={styles.title}>{step.title}</Text>
-                    {step.image && <Image source={step.image} style={styles.image} />}
-                    <Text style={styles.description}>{step.description}</Text>
-                    
-                    <Text style={styles.sectionHeader}>Scientific Rationale:</Text>
-                    <Text style={styles.sectionText}>{step.scientific}</Text>
-                    
-                    <Text style={styles.sectionHeader}>Advantages:</Text>
-                    <Text style={styles.sectionText}>{step.advantages}</Text>
-                </View>
-            ))}
-            
-            {/* Video Button */}
-            <TouchableOpacity 
-                style={styles.videoButton} 
-                onPress={handleVideoOpen}
-                disabled={downloading}
-            >
-                <Ionicons name="play-circle-outline" size={24} color="#fff" style={styles.buttonIcon} />
-                <Text style={styles.buttonText}>
-                    {downloading ? 'Opening...' : 'Watch Demonstration Video'}
+            <ScrollView style={styles.scrollContainer}>
+                <Text style={styles.subheading}>
+                    A powerful, natural way to enhance comfort, relaxation, and labor progression while effectively managing pain.
                 </Text>
-            </TouchableOpacity>
-
-            {/* Navigation button */}
-            <TouchableOpacity 
-                style={styles.navigationButton} 
-                onPress={() => navigation.navigate('Home')}
-            >
-                <Ionicons name="home-outline" size={24} color="#fff" style={styles.buttonIcon} />
-                <Text style={styles.buttonText}>Back to Home</Text>
-            </TouchableOpacity>
-            
-            <View style={styles.spacer} />
-        </ScrollView>
+                
+                {steps.map((step, index) => (
+                    <View key={index} style={styles.stepContainer}>
+                        <Text style={styles.title}>{step.title}</Text>
+                        {step.image && <Image source={step.image} style={styles.image} />}
+                        <Text style={styles.description}>{step.description}</Text>
+                        
+                        <Text style={styles.sectionHeader}>Scientific Rationale:</Text>
+                        <Text style={styles.sectionText}>{step.scientific}</Text>
+                        
+                        <Text style={styles.sectionHeader}>Advantages:</Text>
+                        <Text style={styles.sectionText}>{step.advantages}</Text>
+                    </View>
+                ))}
+                
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity 
+                        style={styles.videoButton} 
+                        onPress={handleVideoOpen}
+                        disabled={downloading}
+                    >
+                        <Ionicons name="play-circle-outline" size={24} color="#fff" style={styles.buttonIcon} />
+                        <Text style={styles.buttonText}>
+                            {downloading ? 'Opening...' : 'Watch Demonstration Video'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                
+                <View style={styles.spacer} />
+            </ScrollView>
+        </View>
     );
 };
 
@@ -122,15 +125,28 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f8f9fa',
-        paddingHorizontal: 16
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingTop: 40,
+        paddingBottom: 10,
+        backgroundColor: '#f8f9fa',
+    },
+    backButton: {
+        padding: 10,
+        marginRight: 10,
+    },
+    scrollContainer: {
+        flex: 1,
+        paddingHorizontal: 16,
     },
     heading: {
         fontSize: 28,
         fontWeight: 'bold',
-        textAlign: 'center',
-        marginVertical: 20,
         color: '#2e7d32',
-        marginTop: 30
+        flex: 1,
     },
     subheading: {
         fontSize: 16,
@@ -189,28 +205,15 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         resizeMode: 'cover'
     },
+    buttonContainer: {
+        marginVertical: 20,
+    },
     videoButton: {
         backgroundColor: '#2196F3',
         padding: 15,
         borderRadius: 27,
         alignItems: 'center',
-        marginVertical: 15,
-        height: 54,
-        justifyContent: 'center',
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOpacity: 0.25,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        marginHorizontal: 20,
-        flexDirection: 'row',
-    },
-    navigationButton: {
-        backgroundColor: '#dc3545',
-        padding: 15,
-        borderRadius: 27,
-        alignItems: 'center',
-        marginBottom: 30,
+        marginVertical: 10,
         height: 54,
         justifyContent: 'center',
         elevation: 4,

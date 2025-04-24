@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from './config';
 
 // Create the auth context
 const AuthContext = createContext();
@@ -41,7 +42,7 @@ export const AuthProvider = ({ children }) => {
   // Handle Sign In
   const signIn = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,12 +54,14 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
+      console.log('[AuthContext] API Response:', data); // Log API response
 
       if (data.status === 'success') {
         const userInfo = {
           token: data.token,
           ...data.user,
         };
+        console.log('[AuthContext] UserInfo to be set:', userInfo); // Log userInfo object
         await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
         setUserInfo(userInfo);
         return { success: true };
@@ -80,7 +83,7 @@ export const AuthProvider = ({ children }) => {
   // Handle Sign Up
   const signUp = async (fullName, email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/register', {
+      const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -232,5 +232,5 @@ const styles = StyleSheet.create({
     color: themeColors.primary,
     fontSize: 14,
     fontWeight: '600',
-  },
+  }
 });

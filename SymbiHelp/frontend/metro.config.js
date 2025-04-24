@@ -16,4 +16,12 @@ config.maxWorkers = 4;
 // Enable Fast Refresh
 config.transformer.fastRefresh = true;
 
+// Add additional module resolution paths
+config.resolver.nodeModulesPaths = [
+  `${__dirname}/node_modules`,
+  `${__dirname}/utils`,
+  `${__dirname}/components`,
+  `${__dirname}/screens`
+];
+
 module.exports = config; 

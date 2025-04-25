@@ -165,18 +165,18 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   },
   userSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
   },
   welcomeText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    marginLeft: 12,
+    marginLeft: 10,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -234,16 +234,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
     color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
     marginBottom: 8,
   },
   cardDescription: {
-    fontSize: 13,
     color: '#FFFFFF',
+    fontSize: 14,
     opacity: 0.9,
-    lineHeight: 18,
   },
 });
 

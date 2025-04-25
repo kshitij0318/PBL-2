@@ -74,15 +74,14 @@ const BallBirthing = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity 
-                    style={styles.backButton} 
-                    onPress={() => navigation.navigate('HomeMain')}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.goBack()}
                 >
-                    <Ionicons name="arrow-back" size={24} color="#2e7d32" />
+                    <Ionicons name="arrow-back" size={24} color="#7A7FFC" />
                 </TouchableOpacity>
-                <Text style={styles.heading}>Ball Birthing Techniques</Text>
+                <Text style={styles.headerTitle}>Ball Birthing</Text>
             </View>
-            
             <ScrollView style={styles.scrollContainer}>
                 <Text style={styles.subheading}>
                     A powerful, natural way to enhance comfort, relaxation, and labor progression while effectively managing pain.
@@ -130,23 +129,25 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingTop: 40,
-        paddingBottom: 10,
-        backgroundColor: '#f8f9fa',
+        paddingTop: 16,
+        paddingBottom: 8,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
     },
     backButton: {
-        padding: 10,
-        marginRight: 10,
+        padding: 8,
+        marginRight: 8,
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#333',
     },
     scrollContainer: {
         flex: 1,
         paddingHorizontal: 16,
-    },
-    heading: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#2e7d32',
-        flex: 1,
+        paddingTop: 20,
     },
     subheading: {
         fontSize: 16,

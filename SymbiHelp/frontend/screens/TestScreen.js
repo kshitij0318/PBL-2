@@ -423,7 +423,7 @@ export default function TestScreen({ navigation }) {
         >
           <Ionicons name="chevron-back" size={24} color={themeColors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Assessment Test</Text>
+        <Text style={styles.headerTitle}>Test</Text>
         <View style={styles.progressContainer}>
           <Text style={styles.progressText}>
             Question {currentQuestion + 1}/15

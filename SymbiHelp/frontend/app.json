@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "PBL-2",
-    "slug": "PBL-2",
+    "slug": "pbl-2-kshitij",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,7 +29,7 @@
     "plugins": [],
     "extra": {
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "cd0b7e00-218f-4312-9186-d84486b53c38"
       }
     },
     "developmentClient": {

@@ -51,24 +51,21 @@ export default function LamazeBreathing({ navigation }) {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.navigate('HomeMain')}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          <Ionicons name="chevron-back" size={24} color="#2e7d32" />
+          <Ionicons name="arrow-back" size={24} color="#7A7FFC" />
         </TouchableOpacity>
-        <Text style={styles.title}>Lamaze Breathing Techniques</Text>
+        <Text style={styles.headerTitle}>Lamaze Breathing</Text>
       </View>
-      
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <Text style={styles.description}>
           Lamaze breathing is a controlled breathing technique used during labor
           to help manage pain, reduce stress, and promote relaxation. It involves
           a series of slow, deep, and rhythmic breaths that synchronize with
           contractions, allowing the mother to stay focused and maintain a sense
-          of control. This method is grounded in the belief that conscious
-          breathing can enhance oxygen flow, decrease tension, and create a more
-          positive labor experience.
+          of control.
         </Text>
 
         {/* Introduction */}
@@ -257,13 +254,18 @@ export default function LamazeBreathing({ navigation }) {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.videoButton} onPress={openVideo}>
+          <TouchableOpacity 
+            style={styles.videoButton} 
+            onPress={openVideo}
+          >
             <Ionicons name="play-circle-outline" size={24} color="#fff" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Watch Demonstration Video</Text>
+            <Text style={styles.buttonText}>
+              Watch Demonstration Video
+            </Text>
           </TouchableOpacity>
         </View>
         
-        <View style={styles.bottomSpacer} />
+        <View style={styles.spacer} />
       </ScrollView>
     </View>
   );
@@ -273,58 +275,53 @@ export default function LamazeBreathing({ navigation }) {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#e8f5e9', // Light green background
+    backgroundColor: '#f8f9fa',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 40,
-    paddingBottom: 10,
-    backgroundColor: '#e8f5e9',
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   backButton: {
-    padding: 10,
-    marginRight: 10,
+    padding: 8,
+    marginRight: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
   },
   container: {
     flex: 1,
   },
   contentContainer: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1b5e20', // Darker green
-    letterSpacing: 0.5,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-    flex: 1,
+    padding: 16,
   },
   description: {
     fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 25,
-    color: '#37474f', // Dark gray
+    color: '#546e7a',
+    marginBottom: 20,
     lineHeight: 24,
-    letterSpacing: 0.25,
-    paddingHorizontal: 10,
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
   section: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 15,
+    borderRadius: 12,
     marginBottom: 20,
-    elevation: 4,
+    elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 6,
     borderWidth: 1,
-    borderColor: '#c8e6c9', // Light green border
+    borderColor: '#e0e0e0',
   },
   sectionText: {
     fontSize: 16,
@@ -333,98 +330,104 @@ const styles = StyleSheet.create({
     letterSpacing: 0.25,
   },
   stepTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#2e7d32', // Medium green
-    letterSpacing: 0.25,
+    marginBottom: 15,
+    color: '#1b5e20',
+    textAlign: 'center',
   },
   stepDescription: {
     fontSize: 16,
-    color: '#37474f', // Dark gray
     marginBottom: 15,
+    color: '#37474f',
     lineHeight: 24,
-    letterSpacing: 0.25,
+  },
+  image: {
+    width: '100%',
+    height: 220,
+    borderRadius: 10,
+    marginVertical: 15,
+    resizeMode: 'cover',
   },
   scientificRationale: {
     fontSize: 15,
-    fontStyle: 'italic',
     color: '#546e7a',
-    marginTop: 10,
+    marginBottom: 10,
     lineHeight: 22,
+    backgroundColor: '#f1f8e9',
+    padding: 12,
+    borderRadius: 8,
   },
   advantages: {
     fontSize: 15,
     color: '#546e7a',
-    marginTop: 8,
+    marginTop: 10,
     lineHeight: 22,
+    backgroundColor: '#f1f8e9',
+    padding: 12,
+    borderRadius: 8,
   },
   boldText: {
     fontWeight: 'bold',
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 12,
-    marginVertical: 15,
+    color: '#2e7d32',
   },
   conclusionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#2e7d32',
-    letterSpacing: 0.25,
+    marginBottom: 15,
+    color: '#1b5e20',
+    textAlign: 'center',
   },
   conclusionText: {
     fontSize: 16,
     color: '#37474f',
     lineHeight: 24,
-    letterSpacing: 0.25,
   },
   buttonContainer: {
     marginVertical: 20,
   },
   downloadButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 27,
+    alignItems: 'center',
     marginVertical: 10,
     height: 54,
-    borderRadius: 27,
-    backgroundColor: '#4CAF50', // Green color
     justifyContent: 'center',
-    alignItems: 'center',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     marginHorizontal: 20,
     flexDirection: 'row',
   },
   videoButton: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    borderRadius: 27,
+    alignItems: 'center',
     marginVertical: 10,
     height: 54,
-    borderRadius: 27,
-    backgroundColor: '#2196F3', // Blue color
     justifyContent: 'center',
-    alignItems: 'center',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     marginHorizontal: 20,
     flexDirection: 'row',
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
     color: '#fff',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   buttonIcon: {
-    marginRight: 8,
+    marginRight: 4,
   },
-  bottomSpacer: {
-    height: 30,
+  spacer: {
+    height: 20,
   },
 });

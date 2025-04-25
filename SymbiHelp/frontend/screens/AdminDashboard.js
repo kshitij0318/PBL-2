@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ActivityIndicator, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ActivityIndicator, StatusBar, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../utils/ThemeContext';
 import { PieChart } from 'react-native-chart-kit';
-import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../utils/config';
 import { useAuth } from '../utils/AuthContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const REFRESH_INTERVAL = 30000;
+const { width } = Dimensions.get('window');
 
 const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -72,73 +73,97 @@ const AdminDashboard = () => {
 
   const renderTimePeriodSelector = () => (
     <View style={styles.timePeriodContainer}>
-      <TouchableOpacity
-        style={[
-          styles.timePeriodButton,
-          timePeriod === 'week' && styles.selectedTimePeriod,
-          { backgroundColor: theme.cardBackground }
-        ]}
-        onPress={() => setTimePeriod('week')}
+      <LinearGradient
+        colors={[theme.cardBackground, theme.cardBackground]}
+        style={styles.timePeriodGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
       >
-        <Text style={[
-          styles.timePeriodText,
-          timePeriod === 'week' && styles.selectedTimePeriodText,
-          { color: timePeriod === 'week' ? theme.primary : theme.secondaryText }
-        ]}>Week</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          styles.timePeriodButton,
-          timePeriod === 'month' && styles.selectedTimePeriod,
-          { backgroundColor: theme.cardBackground }
-        ]}
-        onPress={() => setTimePeriod('month')}
-      >
-        <Text style={[
-          styles.timePeriodText,
-          timePeriod === 'month' && styles.selectedTimePeriodText,
-          { color: timePeriod === 'month' ? theme.primary : theme.secondaryText }
-        ]}>Month</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          styles.timePeriodButton,
-          timePeriod === 'year' && styles.selectedTimePeriod,
-          { backgroundColor: theme.cardBackground }
-        ]}
-        onPress={() => setTimePeriod('year')}
-      >
-        <Text style={[
-          styles.timePeriodText,
-          timePeriod === 'year' && styles.selectedTimePeriodText,
-          { color: timePeriod === 'year' ? theme.primary : theme.secondaryText }
-        ]}>Year</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.timePeriodButton,
+            timePeriod === 'week' && styles.selectedTimePeriod,
+          ]}
+          onPress={() => setTimePeriod('week')}
+        >
+          <Text style={[
+            styles.timePeriodText,
+            timePeriod === 'week' && styles.selectedTimePeriodText,
+            { color: timePeriod === 'week' ? theme.primary : theme.secondaryText }
+          ]}>Week</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.timePeriodButton,
+            timePeriod === 'month' && styles.selectedTimePeriod,
+          ]}
+          onPress={() => setTimePeriod('month')}
+        >
+          <Text style={[
+            styles.timePeriodText,
+            timePeriod === 'month' && styles.selectedTimePeriodText,
+            { color: timePeriod === 'month' ? theme.primary : theme.secondaryText }
+          ]}>Month</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.timePeriodButton,
+            timePeriod === 'year' && styles.selectedTimePeriod,
+          ]}
+          onPress={() => setTimePeriod('year')}
+        >
+          <Text style={[
+            styles.timePeriodText,
+            timePeriod === 'year' && styles.selectedTimePeriodText,
+            { color: timePeriod === 'year' ? theme.primary : theme.secondaryText }
+          ]}>Year</Text>
+        </TouchableOpacity>
+      </LinearGradient>
     </View>
   );
 
   const renderStatsCard = (title, value, icon, color) => (
-    <View style={[styles.statsCard, { backgroundColor: theme.cardBackground }]}>
-      <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
+    <LinearGradient
+      colors={[color + '20', color + '10']}
+      style={styles.statsCard}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <View style={[styles.iconContainer, { backgroundColor: color + '30' }]}>
         <Ionicons name={icon} size={24} color={color} />
       </View>
       <Text style={[styles.statsValue, { color: theme.darkText }]}>{value}</Text>
       <Text style={[styles.statsTitle, { color: theme.secondaryText }]}>{title}</Text>
-    </View>
+    </LinearGradient>
   );
 
   const renderRecentActivity = () => {
     if (!stats || !stats.recent_activity) return null;
 
     return (
-      <View style={[styles.recentActivityContainer, { backgroundColor: theme.cardBackground }]}>
-        <Text style={[styles.sectionTitle, { color: theme.darkText }]}>Recent Activity</Text>
+      <LinearGradient
+        colors={[theme.cardBackground, theme.cardBackground]}
+        style={styles.recentActivityContainer}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.recentActivityHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.darkText }]}>Recent Activity</Text>
+          <Ionicons name="time-outline" size={20} color={theme.primary} />
+        </View>
         {stats.recent_activity.map((activity, index) => (
           <View key={index} style={styles.activityItem}>
             <View style={styles.activityInfo}>
-              <Text style={[styles.activityUserName, { color: theme.darkText }]}>
-                {activity.user_name}
-              </Text>
+              <View style={styles.activityUserInfo}>
+                <View style={[styles.userAvatar, { backgroundColor: theme.primary + '20' }]}>
+                  <Text style={[styles.userInitial, { color: theme.primary }]}>
+                    {activity.user_name.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={[styles.activityUserName, { color: theme.darkText }]}>
+                  {activity.user_name}
+                </Text>
+              </View>
               <Text style={[styles.activityDate, { color: theme.secondaryText }]}>
                 {new Date(activity.date).toLocaleDateString('en-IN', {
                   day: 'numeric',
@@ -147,14 +172,14 @@ const AdminDashboard = () => {
                 })}
               </Text>
             </View>
-            <View style={styles.activityScore}>
+            <View style={[styles.activityScore, { backgroundColor: theme.primary + '15' }]}>
               <Text style={[styles.activityScoreText, { color: theme.primary }]}>
                 {activity.score}/{activity.max_score}
               </Text>
             </View>
           </View>
         ))}
-      </View>
+      </LinearGradient>
     );
   };
 
@@ -205,9 +230,14 @@ const AdminDashboard = () => {
       />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: theme.darkText }]}>Admin Dashboard</Text>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-            <Ionicons name="log-out-outline" size={26} color={theme.primary} />
+          <View style={styles.headerContent}>
+            <Text style={[styles.headerTitle, { color: theme.darkText }]}>Admin Dashboard</Text>
+            <Text style={[styles.headerSubtitle, { color: theme.secondaryText }]}>
+              Monitor and analyze user activity
+            </Text>
+          </View>
+          <TouchableOpacity onPress={handleLogout} style={[styles.logoutButton, { backgroundColor: theme.primary + '15' }]}>
+            <Ionicons name="log-out-outline" size={24} color={theme.primary} />
           </TouchableOpacity>
         </View>
 
@@ -252,105 +282,131 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
+  },
+  headerContent: {
+    flex: 1,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 14,
   },
   logoutButton: {
-    padding: 5,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   timePeriodContainer: {
+    marginBottom: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  timePeriodGradient: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    padding: 4,
+    borderRadius: 16,
   },
   timePeriodButton: {
-    paddingVertical: 8,
+    flex: 1,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    alignItems: 'center',
   },
   selectedTimePeriod: {
-    borderColor: '#7A7FFC',
+    backgroundColor: 'rgba(122, 127, 252, 0.1)',
   },
   timePeriodText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '500',
   },
   selectedTimePeriodText: {
     fontWeight: '600',
   },
+  timePeriodLabel: {
+    textAlign: 'center',
+    fontSize: 14,
+    marginBottom: 20,
+  },
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
+    justifyContent: 'space-between',
+    marginBottom: 24,
   },
   statsCard: {
     flex: 1,
-    marginHorizontal: 5,
-    padding: 15,
-    borderRadius: 12,
+    marginHorizontal: 4,
+    padding: 16,
+    borderRadius: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   statsValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 6,
   },
   statsTitle: {
-    fontSize: 12,
+    fontSize: 13,
     textAlign: 'center',
   },
   recentActivityContainer: {
-    padding: 15,
-    borderRadius: 12,
+    padding: 20,
+    borderRadius: 16,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  },
+  recentActivityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    marginBottom: 15,
   },
   activityItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  activityUserInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  userInitial: {
+    fontSize: 16,
+    fontWeight: '600',
   },
   activityInfo: {
     flex: 1,
   },
   activityUserName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '500',
     marginBottom: 4,
   },
@@ -358,17 +414,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   activityScore: {
-    marginLeft: 10,
-    alignItems: 'flex-end',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
   activityScoreText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  timePeriodLabel: {
-    textAlign: 'center',
-    fontSize: 14,
-    marginVertical: 10,
+    fontSize: 15,
+    fontWeight: '600',
   },
   errorContainer: {
     flex: 1,

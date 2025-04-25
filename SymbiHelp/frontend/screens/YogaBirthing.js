@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Alert, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function YogaBirthing({ navigation }) {
+const YogaBirthing = ({ navigation }) => {
   const [downloading, setDownloading] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
 
   // This is the URL to a real PDF file - replace with your actual PDF link
-  const pdfUrl = 'https://drive.google.com/file/d/1wizUsx63JTEcqIBuIdL8ImW6aovgRKYY/view?usp=sharing';
-  const videoUrl = 'https://drive.google.com/file/d/1vo5fC3uGvk5OzgPmMpcAZUbFAsXkz74U/view?usp=drive_link';
+  const pdfUrl = 'https://drive.google.com/file/d/1vDuKIRTyL5rLO8CyHB5f-HhZy2hB5ZJ6/view?usp=drive_link';
+  const videoUrl = 'https://drive.google.com/file/d/1unF2kLWDVb8Y4Cip04LOVFFRERQ6aOf5/view?usp=drive_link';
 
   const handleDownload = async () => {
     try {
@@ -52,73 +52,63 @@ export default function YogaBirthing({ navigation }) {
 
   const steps = [
     {
-      title: 'Deep Breathing (Pranayama)',
-      description: 'The mother sits comfortably with her back straight and shoulders relaxed. She inhales deeply through her nose, expanding her abdomen, holds the breath for a few seconds, and then exhales slowly through her mouth. She focuses on making her exhalation longer than her inhalation. This technique is beneficial in all stages of labor to promote relaxation and manage pain. It can be practiced for 5-10 minutes between contractions.',
-      whentouse: 'Useful throughout all phases of labor, especially during contractions in the latent and active phase. Can be practiced for 5-10 minutes between contractions.',
-      scientific: 'Regulates oxygen supply, reduces stress hormones, and enhances relaxation by stimulating the parasympathetic nervous system.',
-      advantages: 'Reduces anxiety, lowers blood pressure, increases oxygen flow to the baby, and helps manage pain during contractions.',
-      image: require('../assets/Yoga/Step1.jpg')
-    },
-    {
       title: 'Cat-Cow Pose',
-      description: 'For this pose, the mother is on all fours, alternating between arching her back (cow pose) and rounding it (cat pose) while synchronizing with deep breaths',
-      whentouse: 'Recommended in the latent and early active phase to ease lower back discomfort and encourage fetal movement. Can be done for 5-7 minutes between contractions',
-      scientific: 'Encourages fetal rotation into an optimal anterior position, improves spinal flexibility, and reduces lower back tension.',
-      advantages: 'Relieves back pain, improves posture, and helps the baby settle into the optimal position for birth.',
-      image: require('../assets/Yoga/Step2.jpg')
+      description: 'Begin on your hands and knees, with your wrists directly under your shoulders and your knees under your hips. As you inhale, arch your back and lift your head and tailbone towards the ceiling. As you exhale, round your back and tuck your chin to your chest. Repeat this movement for 5-10 breaths.',
+      scientific: 'This pose helps to stretch and strengthen the spine, improve posture, and increase flexibility in the back and neck. It also helps to relieve tension in the lower back and hips, which can be beneficial during pregnancy and labor.',
+      advantages: 'Regular practice of the Cat-Cow pose can help to reduce back pain, improve posture, and increase flexibility, making it easier to maintain good posture during labor.',
+      image: require('../assets/Yoga/Step1.jpg'),
     },
     {
-      title: 'Supported Squat',
-      description: 'The mother stands with her feet shoulder-width apart, holding onto a stable surface for support. She slowly lowers into a deep squat, keeping her back straight. She holds for 30 seconds to 1 minute, breathing deeply. This technique is beneficial in the active phase of labor to encourage pelvic opening and fetal descent. It can be practiced for 3-5 minutes between contractions.',
-      whentouse: 'Effective during the active phase of labor to open the pelvis and encourage descent. Can be performed for 5-10 minutes between contractions.',
-      scientific: 'Squatting widens the pelvic outlet by up to 30%, aiding in fetal descent and reducing labor duration.',
-      advantages: 'Promotes natural gravity-assisted birth, reduces strain on the lower back, and enhances uterine contractions.',
-      image: require('../assets/Yoga/Step3.jpg')
+      title: 'Child\'s Pose',
+      description: 'Kneel on the floor and sit back on your heels. Lower your torso to the floor and extend your arms in front of you. Rest your forehead on the floor and breathe deeply.',
+      scientific: 'The Child\'s Pose is a gentle stretch for the back, hips, and thighs. It helps to relieve tension and stress, and can be a calming pose during labor.',
+      advantages: 'This pose can help to reduce stress and anxiety, and provide a sense of calm and relaxation during labor.',
+      image: require('../assets/Yoga/Step2.jpg'),
+    },
+    {
+      title: 'Squat',
+      description: 'Stand with your feet hip-width apart. Lower your body into a squat position, keeping your back straight and your knees aligned with your toes. Hold this position for 30 seconds to 1 minute.',
+      scientific: 'Squats help to strengthen the legs and pelvic floor muscles, which are important for supporting the baby during pregnancy and labor. They also help to improve balance and stability.',
+      advantages: 'Regular practice of squats can help to prepare the body for labor by strengthening the muscles needed for pushing and supporting the baby.',
+      image: require('../assets/Yoga/Step3.jpg'),
     },
     {
       title: 'Butterfly Pose',
-      description: 'The mother sits on the floor with the soles of her feet together, gently pressing the knees toward the floor while maintaining an upright posture.',
-      whentouse: 'Effective in the latent and early active phases of labor. Can be maintained for 5-10 minutes between contractions to open the pelvis.',
-      scientific: 'Stretches the inner thighs, improves circulation in the pelvic region, and prepares the hips for labor.',
-      advantages: 'Enhances flexibility, reduces pelvic tension, and promotes relaxation.',
-      image: require('../assets/Yoga/Step4.jpg')
+      description: 'Sit on the floor with your knees bent and the soles of your feet together. Gently press your knees towards the floor and hold this position for 30 seconds to 1 minute.',
+      scientific: 'The Butterfly Pose helps to stretch the inner thighs and groin, which can be beneficial for opening the hips and preparing for labor.',
+      advantages: 'This pose can help to increase flexibility in the hips and groin, making it easier to find comfortable positions during labor.',
+      image: require('../assets/Yoga/Step4.jpg'),
     },
     {
-      title: 'Forward Leaning Pose',
-      description: 'The mother stands with feet hip-width apart, bending forward to rest her hands on a stable surface or a birthing ball. She gently sways side to side',
-      whentouse: 'Beneficial in all phases of labor, particularly during contractions. Can be maintained for 5-10 minutes as needed.',
-      scientific: 'Uses gravity to encourage fetal descent and relieves pressure from the lower back." Advantages: "Eases tension in the lower back and pelvis, promotes fetal positioning, and helps manage contractions effectively.',
-      advantages: 'Reduces back pain, encourages optimal fetal positioning, and provides a comfortable position during contractions.',
-      image: require('../assets/Yoga/Step5.jpg')
+      title: 'Pigeon Pose',
+      description: 'Start in a plank position and bring your right knee forward, placing it behind your right wrist. Extend your left leg behind you and lower your body to the floor. Hold this position for 30 seconds to 1 minute, then switch sides.',
+      scientific: 'The Pigeon Pose helps to stretch the hip flexors and glutes, which can be tight during pregnancy. It also helps to improve hip mobility and reduce tension in the lower back.',
+      advantages: 'Regular practice of the Pigeon Pose can help to reduce hip and lower back pain, and improve hip mobility, making it easier to find comfortable positions during labor.',
+      image: require('../assets/Yoga/Step5.jpg'),
     }
   ];
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.navigate('HomeMain')}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#2e7d32" />
+          <Ionicons name="arrow-back" size={24} color="#7A7FFC" />
         </TouchableOpacity>
-        <Text style={styles.title}>Yoga During the Birthing Process</Text>
+        <Text style={styles.headerTitle}>Yoga Birthing</Text>
       </View>
-      
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.description}>
-          Yoga can help ease discomfort, promote relaxation, and encourage optimal fetal positioning during labor.
-          Below are key yoga poses beneficial for the birthing process.
+      <ScrollView style={styles.scrollContainer}>
+        <Text style={styles.subheading}>
+          A series of yoga poses designed to help prepare the body for labor and delivery, promoting flexibility, strength, and relaxation.
         </Text>
 
         {steps.map((step, index) => (
-          <View key={index} style={styles.section}>
-            <Text style={styles.stepTitle}>{step.title}</Text>
+          <View key={index} style={styles.stepContainer}>
+            <Text style={styles.title}>{step.title}</Text>
             {step.image && <Image source={step.image} style={styles.image} />}
-            <Text style={styles.stepDescription}>{step.description}</Text>
-            
-            <Text style={styles.sectionHeader}>When to Use:</Text>
-            <Text style={styles.sectionText}>{step.whentouse}</Text>
+            <Text style={styles.description}>{step.description}</Text>
             
             <Text style={styles.sectionHeader}>Scientific Rationale:</Text>
             <Text style={styles.sectionText}>{step.scientific}</Text>
@@ -127,9 +117,8 @@ export default function YogaBirthing({ navigation }) {
             <Text style={styles.sectionText}>{step.advantages}</Text>
           </View>
         ))}
-
+        
         <View style={styles.buttonContainer}>
-          {/* Download Button */}
           <TouchableOpacity 
             style={styles.downloadButton} 
             onPress={handleDownload}
@@ -141,7 +130,6 @@ export default function YogaBirthing({ navigation }) {
             </Text>
           </TouchableOpacity>
 
-          {/* Video Button */}
           <TouchableOpacity 
             style={styles.videoButton} 
             onPress={handleVideoOpen}
@@ -154,83 +142,75 @@ export default function YogaBirthing({ navigation }) {
           </TouchableOpacity>
         </View>
         
-        {/* Extra padding view to ensure content is visible */}
-        <View style={styles.bottomSpacer} />
+        <View style={styles.spacer} />
       </ScrollView>
     </View>
   );
-}
+};
 
 // Styles
 const styles = StyleSheet.create({
-  mainContainer: {
+  container: {
     flex: 1,
-    backgroundColor: '#e8f5e9', // Light green background
+    backgroundColor: '#f8f9fa',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 40,
-    paddingBottom: 10,
-    backgroundColor: '#e8f5e9',
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   backButton: {
-    padding: 10,
-    marginRight: 10,
+    padding: 8,
+    marginRight: 8,
   },
-  container: {
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  scrollContainer: {
     flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
-  contentContainer: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1b5e20', // Darker green
-    letterSpacing: 0.5,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-    flex: 1,
-  },
-  description: {
+  subheading: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 25,
-    color: '#37474f', // Dark gray
-    lineHeight: 24,
-    letterSpacing: 0.25,
-    paddingHorizontal: 10,
+    color: '#546e7a',
+    paddingHorizontal: 20,
+    lineHeight: 24
   },
-  section: {
+  stepContainer: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 15,
+    borderRadius: 12,
     marginBottom: 20,
-    elevation: 4,
+    elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 6,
     borderWidth: 1,
-    borderColor: '#c8e6c9', // Light green border
+    borderColor: '#e0e0e0',
   },
-  stepTitle: {
-    fontSize: 20,
+  title: {
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#2e7d32', // Medium green
-    letterSpacing: 0.25,
-  },
-  stepDescription: {
-    fontSize: 16,
-    color: '#37474f', // Dark gray
     marginBottom: 15,
-    lineHeight: 24,
-    letterSpacing: 0.25,
+    color: '#1b5e20',
+    textAlign: 'center'
+  },
+  description: {
+    fontSize: 16,
+    marginBottom: 15,
+    color: '#37474f',
+    lineHeight: 24
   },
   sectionHeader: {
     fontSize: 18,
@@ -250,54 +230,58 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
-    borderRadius: 12,
+    height: 220,
+    borderRadius: 10,
     marginBottom: 15,
+    resizeMode: 'cover'
   },
   buttonContainer: {
     marginVertical: 20,
   },
   downloadButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 27,
+    alignItems: 'center',
     marginVertical: 10,
     height: 54,
-    borderRadius: 27,
-    backgroundColor: '#4CAF50',
     justifyContent: 'center',
-    alignItems: 'center',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     marginHorizontal: 20,
     flexDirection: 'row',
   },
   videoButton: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    borderRadius: 27,
+    alignItems: 'center',
     marginVertical: 10,
     height: 54,
-    borderRadius: 27,
-    backgroundColor: '#2196F3',
     justifyContent: 'center',
-    alignItems: 'center',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     marginHorizontal: 20,
     flexDirection: 'row',
   },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
   buttonIcon: {
-    marginRight: 8,
+    marginRight: 10,
   },
-  bottomSpacer: {
-    height: 30,
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    letterSpacing: 0.5,
   },
+  spacer: {
+    height: 20
+  }
 });
+
+export default YogaBirthing;

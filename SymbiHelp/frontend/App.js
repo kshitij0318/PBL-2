@@ -3,7 +3,7 @@ import React, { Suspense } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Platform, View, Text, LogBox, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native';
+import { Platform, View, Text, LogBox, StyleSheet, ActivityIndicator, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 // Screen Imports
@@ -51,26 +51,22 @@ function HomeStackNavigator() {
   const { theme } = useTheme();
   return (
     <Stack.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerStyle: {
-          backgroundColor: theme.primary,
+          backgroundColor: '#7A7FFC',
         },
-        headerTintColor: theme.white,
+        headerTintColor: '#FFFFFF',
         headerTitleStyle: {
           fontWeight: '600',
           fontSize: 18,
         },
+        headerLeft: null,
+        headerBackVisible: false,
         headerBackTitleVisible: false,
         contentStyle: {
-          backgroundColor: theme.lightBackground,
+          backgroundColor: '#f8f9fa',
         },
-        headerShadowVisible: false,
-        headerBackVisible: true,
-        headerBackTitle: '',
-        headerBackImageSource: null,
-        headerBackImage: () => (
-          <Ionicons name="chevron-back" size={24} color={theme.white} />
-        ),
+        headerShadowVisible: true,
         animation: 'slide_from_right',
         animationDuration: 200,
         gestureEnabled: true,
@@ -85,17 +81,17 @@ function HomeStackNavigator() {
         freezeOnBlur: true,
         screenOrientation: 'portrait',
         statusBarAnimation: 'fade',
-        statusBarColor: theme.primary,
+        statusBarColor: '#7A7FFC',
         statusBarStyle: 'light',
         statusBarTranslucent: true,
         statusBarHidden: false,
-      }}
+      })}
     >
       <Stack.Screen 
         name="HomeMain" 
         component={HomeScreen} 
         options={{ 
-          title: 'Guide',
+          title: 'SymbiHelp',
           headerTitleStyle: {
             fontSize: 20,
             fontWeight: '600',
@@ -106,7 +102,7 @@ function HomeStackNavigator() {
         name="LamazeBreathing" 
         component={LamazeBreathing} 
         options={{ 
-          title: 'Lamaze Breathing',
+          title: 'SymbiHelp',
           headerTitleStyle: {
             fontSize: 18,
             fontWeight: '600',
@@ -117,7 +113,7 @@ function HomeStackNavigator() {
         name="BallBirthing" 
         component={BallBirthing} 
         options={{ 
-          title: 'Ball Birthing',
+          title: 'SymbiHelp',
           headerTitleStyle: {
             fontSize: 18,
             fontWeight: '600',
@@ -128,7 +124,7 @@ function HomeStackNavigator() {
         name="YogaBirthing" 
         component={YogaBirthing} 
         options={{ 
-          title: 'Yoga Birthing',
+          title: 'SymbiHelp',
           headerTitleStyle: {
             fontSize: 18,
             fontWeight: '600',
@@ -139,7 +135,7 @@ function HomeStackNavigator() {
         name="Shiatsu" 
         component={Shiatsu} 
         options={{ 
-          title: 'Shiatsu',
+          title: 'SymbiHelp',
           headerTitleStyle: {
             fontSize: 18,
             fontWeight: '600',
@@ -150,7 +146,7 @@ function HomeStackNavigator() {
         name="Test" 
         component={TestScreen} 
         options={{ 
-          title: 'Assessment',
+          title: 'SymbiHelp',
           presentation: 'modal',
           animation: 'slide_from_bottom'
         }} 
@@ -159,7 +155,7 @@ function HomeStackNavigator() {
         name="Predict" 
         component={PredictScreen} 
         options={{ 
-          title: 'Risk Prediction',
+          title: 'SymbiHelp',
           headerTitleStyle: {
             fontSize: 18,
             fontWeight: '600',

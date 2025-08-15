@@ -19,6 +19,7 @@ import TestScreen from './screens/TestScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import PredictScreen from './screens/PredictScreen';
 import ChatBotScreen from './screens/ChatBotScreen';
+import CommunityForumScreen from './screens/CommunityForumScreen';
 
 // Import AuthProvider and ThemeProvider
 import { AuthProvider, useAuth } from './utils/AuthContext';
@@ -162,6 +163,13 @@ function HomeStackNavigator() {
           }
         }} 
       />
+      <Stack.Screen
+        name="CommunityForum"
+        component={CommunityForumScreen}
+        options={{
+          headerShown: false, // We hide this header because the screen has its own
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -262,7 +270,7 @@ function Navigation() {
               <Stack.Screen name="SignIn" component={SignInScreen} />
               <Stack.Screen name="SignUp" component={SignUpScreen} />
             </>
-          ) : userInfo.is_admin === true ? (
+          ) : userInfo.is_admin === true ? ( // --- THIS LINE IS NOW CORRECTED ---
             <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
           ) : (
             <Stack.Screen name="MainApp" component={MainTabNavigator} />

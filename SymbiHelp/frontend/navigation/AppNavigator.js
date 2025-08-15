@@ -4,7 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import TestScreen from '../screens/TestScreen';
 import ProgressScreen from '../screens/ProgressScreen';
 import AdminDashboard from '../screens/AdminDashboard';
-
+import CommunityForumScreen from '../screens/CommunityForumScreen'; // This is correct
 const Stack = createNativeStackNavigator();
 
 function AppNavigator() {
@@ -58,6 +58,17 @@ function AppNavigator() {
           headerShown: false,
         }}
       />
+      
+      {/* --- ADD THIS LINE --- */}
+      <Stack.Screen
+        name="CommunityForum"
+        component={CommunityForumScreen}
+        options={{
+          title: 'Community Forum', // You can set the header title here
+        }}
+      />
+      {/* -------------------- */}
+
     </Stack.Navigator>
   );
 }

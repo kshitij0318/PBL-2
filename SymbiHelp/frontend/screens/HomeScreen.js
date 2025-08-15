@@ -74,6 +74,14 @@ const techniques = [
     description: 'Predict potential health risks',
     color: '#7A7FFC',
   },
+  {
+  id: 'forum',
+  name: 'Community Forum',
+  icon: 'chatbubbles-outline',
+  screen: 'CommunityForum', // This name must match the name in AppNavigator.js
+  description: 'Connect with other mothers',
+  color: '#4DD0E1', // A new color to make it stand out
+},
 ];
 
 export default function HomeScreen({ navigation }) {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react'; // Import useMemo
 import {
   View,
   Text,
@@ -7,82 +7,14 @@ import {
   ScrollView,
   SafeAreaView,
   Alert,
-  Image,
+  // Image, // <-- Removed unused import
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../utils/AuthContext';
 import { useTheme } from '../utils/ThemeContext';
+import { techniques } from '../constants/techniquesData'; // <-- Import data
 
-// Theme colors
-const themeColors = {
-  primary: '#7A7FFC',
-  lightPrimary: '#E8E9FF',
-  lightBackground: '#F0F4FF',
-  white: '#FFFFFF',
-  text: '#333',
-  darkText: '#1E1E1E',
-  placeholder: '#A0A0A0',
-};
-
-// Techniques data
-const techniques = [
-  {
-    id: 'lamaze',
-    name: 'Lamaze Breathing',
-    icon: 'person-outline',
-    screen: 'LamazeBreathing',
-    description: 'Master breathing techniques for labor',
-    color: '#FF9EAA',
-  },
-  {
-    id: 'ball',
-    name: 'Ball Birthing',
-    icon: 'basketball-outline',
-    screen: 'BallBirthing',
-    description: 'Use birthing ball exercises for comfort',
-    color: '#94B8FF',
-  },
-  {
-    id: 'yoga',
-    name: 'Yoga Birthing',
-    icon: 'body-outline',
-    screen: 'YogaBirthing',
-    description: 'Practice pregnancy-safe yoga poses',
-    color: '#98E5BE',
-  },
-  {
-    id: 'shiatsu',
-    name: 'Shiatsu',
-    icon: 'hand-left-outline',
-    screen: 'Shiatsu',
-    description: 'Learn pressure point techniques',
-    color: '#FFB992',
-  },
-  {
-    id: 'test',
-    name: 'Assessment Test',
-    icon: 'help-circle-outline',
-    screen: 'Test',
-    description: 'Take a test to assess your knowledge',
-    color: '#B292FF',
-  },
-  {
-    id: 'predict',
-    name: 'Risk Prediction',
-    icon: 'analytics-outline',
-    screen: 'Predict',
-    description: 'Predict potential health risks',
-    color: '#7A7FFC',
-  },
-  {
-  id: 'forum',
-  name: 'Community Forum',
-  icon: 'chatbubbles-outline',
-  screen: 'CommunityForum', // This name must match the name in AppNavigator.js
-  description: 'Connect with other mothers',
-  color: '#4DD0E1', // A new color to make it stand out
-},
-];
+// themeColors constant removed <-- Removed unused constant
 
 export default function HomeScreen({ navigation }) {
   const { userInfo, signOut } = useAuth();
@@ -98,14 +30,27 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  // <-- Extracted welcome message logic for clarity and performance
+  const welcomeName = useMemo(() => {
+    return userInfo?.full_name?.split(' ')[0] 
+      || userInfo?.email?.split('@')[0] 
+      || 'User';
+  }, [userInfo]);
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.lightBackground }]}>
-      <View style={[styles.header, { backgroundColor: theme.headerBackground }]}>
+      <View style={[
+          styles.header, 
+          { 
+            backgroundColor: theme.headerBackground,
+            borderBottomColor: theme.lightPrimary // <-- Added explicit border color
+          }
+      ]}>
         <View style={styles.headerRow}>
           <View style={styles.userSection}>
             <Ionicons name="person-circle-outline" size={32} color={theme.primary} />
             <Text style={[styles.welcomeText, { color: theme.darkText }]}>
-              Welcome, {userInfo?.full_name?.split(' ')[0] || userInfo?.email?.split('@')[0] || 'User'}
+              Welcome, {welcomeName} {/* <-- Use the new variable */}
             </Text>
           </View>
           <View style={styles.actionButtons}>
@@ -141,6 +86,10 @@ export default function HomeScreen({ navigation }) {
                 style={styles.cardWrapper}
                 onPress={() => navigation.navigate(item.screen)}
                 activeOpacity={0.7}
+                // <-- Accessibility improvements
+                accessibilityLabel={item.name}
+                accessibilityHint={item.description}
+                accessibilityRole="button"
               >
                 <View style={[styles.card, { backgroundColor: item.color }]}>
                   <View style={styles.iconContainer}>
@@ -170,6 +119,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
+    // borderBottomColor is now set dynamically inline
   },
   headerRow: {
     flexDirection: 'row',
@@ -177,6 +127,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
+  // ... rest of your styles (they are great, no changes needed)
   userSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -253,4 +204,3 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
 });
-

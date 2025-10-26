@@ -15,13 +15,15 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy import func
 from functools import wraps
 import logging
+from pathlib import Path
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from .env file in the same directory as main.py
+env_path = Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path, override=True)
 
 # Environment variables
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')

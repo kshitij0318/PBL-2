@@ -29,7 +29,10 @@ load_dotenv(dotenv_path=env_path, override=True)
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-ENV = os.getenv('FLASK_ENV', 'production')  # 'development' or 'production'
+ENV = os.getenv('FLASK_ENV', 'production').lower()  # 'development' or 'production'
+
+# Environment specific settings
+IS_DEVELOPMENT = ENV == 'development'
 
 # Validate environment variables with detailed logging
 missing_vars = []
@@ -55,15 +58,27 @@ if GROQ_API_KEY:
 
 app = Flask(__name__)
 
-# Configure CORS to allow all origins
-CORS(app, resources={
-    r"/*": {
-        "origins": "*",  # Allow all origins
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True
-    }
-})
+# Configure CORS based on environment
+if IS_DEVELOPMENT:
+    # In development, allow all origins for easier testing
+    CORS(app, resources={
+        r"/*": {
+            "origins": "*",
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    })
+else:
+    # In production, restrict to your frontend domain
+    CORS(app, resources={
+        r"/*": {
+            "origins": ["https://your-render-app-url.onrender.com"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    })
 
 # Configure SQLAlchemy for Aiven PostgreSQL
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace("postgres://", "postgresql://")
@@ -1840,4 +1855,16 @@ def update_appointment():
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=ENV == 'development')
+    host = '0.0.0.0' if not IS_DEVELOPMENT else '127.0.0.1'
+    
+    # Print startup information
+    print(f"\n{'='*50}")
+    print(f"Starting server in {'DEVELOPMENT' if IS_DEVELOPMENT else 'PRODUCTION'} mode")
+    print(f"Environment: {ENV}")
+    print(f"Database URL: {'Set' if DATABASE_URL else 'Not set'}")
+    print(f"GROQ API Key: {'Set' if GROQ_API_KEY else 'Not set'}")
+    print(f"JWT Secret: {'Set' if JWT_SECRET_KEY else 'Not set'}")
+    print(f"Server running on: http://{host}:{port}")
+    print("="*50 + "\n")
+    
+    app.run(host=host, port=port, debug=IS_DEVELOPMENT)

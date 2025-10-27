@@ -58,34 +58,63 @@ if GROQ_API_KEY:
 
 app = Flask(__name__)
 
+# Handle OPTIONS requests for CORS preflight
+@app.before_request
+def handle_options():
+    if request.method == 'OPTIONS':
+        response = jsonify({})
+        if IS_DEVELOPMENT:
+            response.headers.add('Access-Control-Allow-Origin', 'http://localhost:8081')
+        else:
+            response.headers.add('Access-Control-Allow-Origin', 'https://your-frontend-domain.com')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        return response, 200
+
 # Configure CORS based on environment
 if IS_DEVELOPMENT:
     # In development, allow all origins for easier testing
     CORS(app, resources={
         r"/*": {
-            "origins": "*",
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
+            "origins": ["http://localhost:8081", "http://127.0.0.1:8081"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
+            "supports_credentials": True,
+            "expose_headers": ["Content-Disposition"]
         }
     })
 else:
     # In production, restrict to your frontend domain
     CORS(app, resources={
         r"/*": {
-            "origins": ["https://your-render-app-url.onrender.com"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
+            "origins": ["https://your-frontend-domain.com"],  # Replace with your actual frontend domain
+            "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
+            "supports_credentials": True,
+            "expose_headers": ["Content-Disposition"]
         }
     })
 
-# Configure SQLAlchemy for Aiven PostgreSQL
+# Configure SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace("postgres://", "postgresql://")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    'connect_args': {'sslmode': 'require'}
-}
+
+# Configure SSL based on environment
+if IS_DEVELOPMENT:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'connect_args': {
+            'sslmode': 'disable',  # Disable SSL for local development
+            'connect_timeout': 5
+        }
+    }
+else:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'connect_args': {
+            'sslmode': 'require',  # Require SSL in production
+            'connect_timeout': 5
+        }
+    }
 
 db = SQLAlchemy(app)
 
@@ -98,6 +127,7 @@ class User(db.Model):
     full_name = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), default='mother', nullable=False)  # 'nurse', 'admin', 'mother'
     due_date = db.Column(db.Date, nullable=True)  # New field for mother's due date
+    birthdate = db.Column(db.Date, nullable=True)  # Birth date for calculating age
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_admin = db.Column(db.Boolean, default=False)
     share_consent = db.Column(db.Boolean, default=False)  # Consent for data sharing with nurses
@@ -888,7 +918,7 @@ def get_test_scores():
 def get_admin_stats():
     try:
         user = User.query.get(request.user_id)
-        if not user or not user.is_admin:
+        if not user or (not user.is_admin and user.role != 'admin'):
             logger.warning(f"Unauthorized admin stats access attempt by user_id {request.user_id}")
             return jsonify({
                 'status': 'error',
@@ -986,7 +1016,7 @@ def get_admin_stats():
 def get_all_users():
     try:
         user = User.query.get(request.user_id)
-        if not user or not user.is_admin:
+        if not user or (not user.is_admin and user.role != 'admin'):
             logger.warning(f"Unauthorized users list access attempt by user_id {request.user_id}")
             return jsonify({
                 'status': 'error',
@@ -1060,6 +1090,59 @@ def update_due_date():
         return jsonify({
             'status': 'error',
             'message': f'Error updating due date: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/update-birthdate', methods=['POST'])
+@require_auth
+def update_birthdate():
+    try:
+        user = User.query.get(request.user_id)
+        if not user or user.role != 'mother':
+            logger.warning(f"Unauthorized birthdate update attempt by user_id {request.user_id}")
+            return jsonify({
+                'status': 'error',
+                'message': 'Unauthorized access. Only mothers can update birthdate.'
+            }), HTTPStatus.FORBIDDEN
+
+        data = request.get_json()
+        birthdate_str = data.get('birthdate')
+        
+        if not birthdate_str:
+            return jsonify({
+                'status': 'error',
+                'message': 'Birthdate is required'
+            }), HTTPStatus.BAD_REQUEST
+
+        try:
+            birthdate = datetime.strptime(birthdate_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid date format. Use YYYY-MM-DD'
+            }), HTTPStatus.BAD_REQUEST
+
+        # Check if birthdate is in the future
+        if birthdate > datetime.now().date():
+            return jsonify({
+                'status': 'error',
+                'message': 'Birthdate cannot be in the future'
+            }), HTTPStatus.BAD_REQUEST
+
+        user.birthdate = birthdate
+        db.session.commit()
+
+        logger.info(f"Birthdate updated for user_id {request.user_id}: {birthdate}")
+        return jsonify({
+            'status': 'success',
+            'message': 'Birthdate updated successfully',
+            'birthdate': birthdate.isoformat()
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        logger.error(f"Error updating birthdate for user_id {request.user_id}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error updating birthdate: {str(e)}'
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route('/update-health-log', methods=['POST'])
@@ -1173,6 +1256,7 @@ def get_mother_profile():
             'full_name': user.full_name,
             'role': user.role,
             'due_date': user.due_date.isoformat() if user.due_date else None,
+            'birthdate': user.birthdate.isoformat() if user.birthdate else None,
             'created_at': user.created_at.isoformat()
         }
 
@@ -1295,12 +1379,12 @@ def update_gamification():
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
 # Admin endpoints for mother-nurse assignment management
-@app.route('/admin/mothers', methods=['GET'])
+@app.route('/admin/mothers', methods=['GET', 'OPTIONS'])
 @require_auth
 def get_all_mothers_admin():
     try:
         user = User.query.get(request.user_id)
-        if not user or not user.is_admin:
+        if not user or (not user.is_admin and user.role != 'admin'):
             logger.warning(f"Unauthorized access attempt to get all mothers by user_id {request.user_id}")
             return jsonify({
                 'status': 'error',
@@ -1348,12 +1432,12 @@ def get_all_mothers_admin():
             'message': f'Error retrieving mother list: {str(e)}'
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
-@app.route('/admin/nurses', methods=['GET'])
+@app.route('/admin/nurses', methods=['GET', 'OPTIONS'])
 @require_auth
 def get_all_nurses_admin():
     try:
         user = User.query.get(request.user_id)
-        if not user or not user.is_admin:
+        if not user or (not user.is_admin and user.role != 'admin'):
             logger.warning(f"Unauthorized access attempt to get all nurses by user_id {request.user_id}")
             return jsonify({
                 'status': 'error',
@@ -1458,7 +1542,7 @@ def get_nurse_assigned_mothers():
 def admin_assign_mother():
     try:
         user = User.query.get(request.user_id)
-        if not user or not user.is_admin:
+        if not user or (not user.is_admin and user.role != 'admin'):
             logger.warning(f"Unauthorized mother assignment attempt by user_id {request.user_id}")
             return jsonify({
                 'status': 'error',
@@ -1561,7 +1645,7 @@ def admin_assign_mother():
 def admin_remove_assignment():
     try:
         user = User.query.get(request.user_id)
-        if not user or not user.is_admin:
+        if not user or (not user.is_admin and user.role != 'admin'):
             logger.warning(f"Unauthorized assignment removal attempt by user_id {request.user_id}")
             return jsonify({
                 'status': 'error',
@@ -1689,6 +1773,143 @@ def get_assigned_mothers():
         return jsonify({
             'status': 'error',
             'message': f'Error: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/admin/test-results', methods=['GET'])
+@require_auth
+def get_all_test_results_admin():
+    """Get all test scores (quiz results) with nurse and mother information for admin dashboard"""
+    try:
+        user = User.query.get(request.user_id)
+        if not user or (not user.is_admin and user.role != 'admin'):
+            logger.warning(f"Unauthorized access attempt to get all test results by user_id {request.user_id}")
+            return jsonify({
+                'status': 'error',
+                'message': 'Unauthorized access. Only admins can view all test results.'
+            }), HTTPStatus.FORBIDDEN
+
+        # Get all test scores (quiz results)
+        test_scores = TestScore.query.order_by(TestScore.test_date.desc()).limit(100).all()
+        
+        results_with_users = []
+        for score_record in test_scores:
+            # Get user information
+            test_user = User.query.get(score_record.user_id)
+            if not test_user:
+                continue
+                
+            # Determine who performed the test
+            performed_by = 'Self'
+            if test_user.role == 'nurse':
+                # If a nurse took the test, show it as the nurse
+                performed_by = test_user.full_name
+            elif test_user.role == 'mother':
+                # If a mother took the test, check if she's assigned to a nurse
+                assignment = NurseMotherAssignment.query.filter_by(mother_id=score_record.user_id).first()
+                if assignment:
+                    nurse = User.query.get(assignment.nurse_id)
+                    performed_by = f"Nurse: {nurse.full_name}" if nurse else 'Nurse Assigned'
+            
+            results_with_users.append({
+                'id': score_record.id,
+                'user_id': score_record.user_id,
+                'user_name': test_user.full_name,
+                'user_email': test_user.email,
+                'score': score_record.score,
+                'max_score': score_record.max_score,
+                'test_date': score_record.test_date.isoformat(),
+                'performed_by': performed_by,
+                'user_role': test_user.role
+            })
+
+        logger.info(f"All test scores retrieved by admin user_id {request.user_id}, count: {len(results_with_users)}")
+        return jsonify({
+            'status': 'success',
+            'test_results': results_with_users
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        logger.error(f"Error retrieving all test results: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error retrieving test results: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/nurse/import-health-data', methods=['POST'])
+@require_auth
+def nurse_import_health_data():
+    """Allow nurses to import health data for their assigned mothers"""
+    try:
+        nurse = User.query.get(request.user_id)
+        if not nurse or nurse.role != 'nurse':
+            logger.warning(f"Unauthorized health data import attempt by user_id {request.user_id}")
+            return jsonify({
+                'status': 'error',
+                'message': 'Unauthorized access. Only nurses can import health data.'
+            }), HTTPStatus.FORBIDDEN
+
+        data = request.get_json()
+        mother_id = data.get('mother_id')
+        health_data = data.get('health_data')
+        
+        if not mother_id or not health_data:
+            return jsonify({
+                'status': 'error',
+                'message': 'mother_id and health_data are required'
+            }), HTTPStatus.BAD_REQUEST
+
+        # Check if mother is assigned to this nurse
+        assignment = NurseMotherAssignment.query.filter_by(
+            nurse_id=request.user_id, 
+            mother_id=mother_id
+        ).first()
+        
+        if not assignment:
+            return jsonify({
+                'status': 'error',
+                'message': 'Mother is not assigned to this nurse'
+            }), HTTPStatus.FORBIDDEN
+
+        # Get mother
+        mother = User.query.get(mother_id)
+        if not mother or not mother.share_consent:
+            return jsonify({
+                'status': 'error',
+                'message': 'Mother has not given consent for data sharing'
+            }), HTTPStatus.FORBIDDEN
+
+        # Validate required health data fields
+        required_fields = ['Age', 'SystolicBP', 'DiastolicBP', 'BS', 'BodyTemp', 'HeartRate']
+        for field in required_fields:
+            if field not in health_data or not health_data[field]:
+                return jsonify({
+                    'status': 'error',
+                    'message': f'Missing required field: {field}'
+                }), HTTPStatus.BAD_REQUEST
+
+        # Create new health log entry
+        health_log = MotherHealthLog(
+            user_id=mother_id,
+            data=health_data,
+            consent_shared=True
+        )
+        
+        db.session.add(health_log)
+        db.session.commit()
+
+        logger.info(f"Health data imported by nurse {request.user_id} for mother {mother_id}")
+        return jsonify({
+            'status': 'success',
+            'message': 'Health data imported successfully',
+            'log_id': health_log.id
+        }), HTTPStatus.CREATED
+
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error importing health data: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error importing health data: {str(e)}'
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route('/update-consent', methods=['POST'])

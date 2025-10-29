@@ -38,8 +38,13 @@ const AdminDashboard = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.text();
-        console.error('API Error Response:', errorData);
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        // Handle expired/invalid token by signing the user out so Navigation redirects to SignIn
+        if (response.status === 401 || /token has expired/i.test(errorText)) {
+          await signOut();
+          throw new Error('Session expired. Please sign in again.');
+        }
         throw new Error(`Failed to fetch admin stats (${response.status})`);
       }
 

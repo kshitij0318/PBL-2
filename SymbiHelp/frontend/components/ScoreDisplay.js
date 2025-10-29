@@ -1,131 +1,57 @@
 // src/components/ScoreDisplay.js
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // For icons
-import { saveScore } from '../utils/ProgressManager';
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../utils/ThemeContext';
+import PrimaryButton from './PrimaryButton';
+import Card from './Card';
 
-// Theme colors
-const themeColors = {
-  primary: '#7A7FFC',
-  lightBackground: '#F0F4FF',
-  white: '#FFFFFF',
-  text: '#333',
-  darkText: '#1E1E1E',
-  secondaryText: '#666',
-  placeholder: '#A0A0A0',
-  success: '#28a745', // Green for score
-};
+const ScoreDisplay = ({ score, total = 15, navigation, onRetake }) => {
+  const { theme } = useTheme();
 
-const ScoreDisplay = ({ score, total = 15, navigation, onRetake, topicScores }) => {
   const handleReturnHome = () => {
-    // Navigate to the root HomeMain screen and reset the navigation stack
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'HomeMain' }],
-    });
+    navigation.reset({ index: 0, routes: [{ name: 'HomeMain' }] });
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.lightBackground }]}>
       <View style={styles.container}>
-        <Text style={styles.scoreTitle}>Test Completed!</Text>
-        <Text style={styles.scoreText}>Your Score: {score}/{total}</Text>
-        
-        {/* Button to Retake Test */}
-        <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={onRetake}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="refresh-outline" size={20} color={themeColors.white} style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Retake Test</Text>
-        </TouchableOpacity>
+        <Card style={styles.card}>
+          <Text style={[styles.scoreTitle, { color: theme.darkText }]}>Test Completed</Text>
+          <Text style={[styles.scoreText, { color: theme.primary }]}>Your Score: {score}/{total}</Text>
 
-        {/* Button to View Progress */}
-        <TouchableOpacity
-          style={styles.buttonSecondary}
-          onPress={() => navigation.navigate('ProgressTab')}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="bar-chart-outline" size={20} color={themeColors.primary} style={styles.buttonIcon} />
-          <Text style={styles.buttonTextSecondary}>View Progress</Text>
-        </TouchableOpacity>
+          <View style={styles.buttonsRow}>
+            <PrimaryButton onPress={onRetake} style={styles.flexButton}>
+              <Ionicons name="refresh-outline" size={18} color={theme.white} style={{ marginRight: 8 }} />
+              Retake
+            </PrimaryButton>
 
-        {/* Button to Return Home */}
-        <TouchableOpacity
-          style={styles.buttonSecondary}
-          onPress={handleReturnHome}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="home-outline" size={20} color={themeColors.primary} style={styles.buttonIcon} />
-          <Text style={styles.buttonTextSecondary}>Return Home</Text>
-        </TouchableOpacity>
+            <PrimaryButton onPress={() => navigation.navigate('ProgressTab')} style={[styles.flexButton, styles.ghost]}>
+              <Ionicons name="bar-chart-outline" size={18} color={theme.primary} style={{ marginRight: 8 }} />
+              View Progress
+            </PrimaryButton>
+          </View>
+
+          <PrimaryButton onPress={handleReturnHome} style={[styles.fullWidthButton, styles.ghost]}>
+            <Ionicons name="home-outline" size={18} color={theme.primary} style={{ marginRight: 8 }} />
+            Return Home
+          </PrimaryButton>
+        </Card>
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: themeColors.lightBackground,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center', // Center items horizontally
-    padding: 30,
-  },
-  scoreTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: themeColors.darkText,
-    marginBottom: 15,
-  },
-  scoreText: {
-    fontSize: 22,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 40,
-    color: themeColors.primary, // Use primary color for score
-  },
-  buttonPrimary: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: themeColors.primary,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 15,
-    marginVertical: 10,
-    width: '80%', // Set a width for buttons
-  },
-  buttonSecondary: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: themeColors.white,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 15,
-    marginVertical: 10,
-    width: '80%', // Consistent width
-    borderWidth: 1,
-    borderColor: themeColors.primary,
-  },
-  buttonIcon: {
-    marginRight: 10,
-  },
-  buttonText: {
-    color: themeColors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  buttonTextSecondary: {
-    color: themeColors.primary,
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  safeArea: { flex: 1 },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  card: { width: '100%', maxWidth: 520, alignItems: 'center', paddingVertical: 28 },
+  scoreTitle: { fontSize: 22, fontWeight: '700', marginBottom: 8 },
+  scoreText: { fontSize: 20, fontWeight: '600', marginBottom: 20 },
+  buttonsRow: { flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: 12, marginBottom: 14 },
+  flexButton: { flex: 1, marginHorizontal: 6 },
+  fullWidthButton: { width: '100%' },
+  ghost: { backgroundColor: 'transparent', shadowOpacity: 0, borderWidth: 1 },
 });
 
 export default ScoreDisplay;

@@ -14,20 +14,13 @@ import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle, Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../utils/config';
+import { useTheme } from '../utils/ThemeContext';
+import Card from '../components/Card';
+import PrimaryButton from '../components/PrimaryButton';
+import Screen from '../components/Screen';
+import { Title, Subtitle } from '../components/ThemedText';
 
-// Theme colors
-const themeColors = {
-  primary: '#7A7FFC',
-  lightPrimary: '#E8E9FF',
-  lightBackground: '#F0F4FF',
-  white: '#FFFFFF',
-  text: '#333',
-  darkText: '#1E1E1E',
-  placeholder: '#A0A0A0',
-  error: '#dc3545',
-  success: '#28a745',
-  warning: '#ffc107',
-};
+// Remove local theme; use global theme via useTheme
 
 const RiskMeter = ({ riskLevel }) => {
   const size = Dimensions.get('window').width * 0.6;
@@ -36,20 +29,20 @@ const RiskMeter = ({ riskLevel }) => {
   const circumference = radius * 2 * Math.PI;
   
   let progress = 0;
-  let color = themeColors.success;
+  let color = '#28a745';
   
   // Convert risk level to lowercase for case-insensitive comparison
   const riskLevelLower = riskLevel?.toLowerCase() || '';
   
   if (riskLevelLower.includes('low')) {
     progress = 0.33;
-    color = themeColors.success;
+    color = '#28a745';
   } else if (riskLevelLower.includes('medium') || riskLevelLower.includes('mid')) {
     progress = 0.66;
-    color = themeColors.warning;
+    color = '#ffc107';
   } else if (riskLevelLower.includes('high')) {
     progress = 1;
-    color = themeColors.error;
+    color = '#dc3545';
   }
 
   const progressOffset = circumference - (progress * circumference);
@@ -107,6 +100,7 @@ const RiskMeter = ({ riskLevel }) => {
 };
 
 export default function PredictScreen({ navigation }) {
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     Age: '',
     SystolicBP: '',
@@ -217,18 +211,15 @@ export default function PredictScreen({ navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Health Risk Prediction</Text>
-        <Text style={styles.subtitle}>
-          Enter your health metrics to get a personalized risk assessment
-        </Text>
+    <Screen>
+      <Title>Health Risk Prediction</Title>
+      <Subtitle>Enter your health metrics to get a personalized risk assessment</Subtitle>
 
-        <View style={styles.form}>
+      <Card style={{ marginBottom: 20 }}>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Age</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
               placeholder="Enter your age"
               value={formData.Age}
               onChangeText={(value) => handleInputChange('Age', value)}
@@ -239,7 +230,7 @@ export default function PredictScreen({ navigation }) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Systolic Blood Pressure</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
               placeholder="Enter systolic BP"
               value={formData.SystolicBP}
               onChangeText={(value) => handleInputChange('SystolicBP', value)}
@@ -250,7 +241,7 @@ export default function PredictScreen({ navigation }) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Diastolic Blood Pressure</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
               placeholder="Enter diastolic BP"
               value={formData.DiastolicBP}
               onChangeText={(value) => handleInputChange('DiastolicBP', value)}
@@ -261,7 +252,7 @@ export default function PredictScreen({ navigation }) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Blood Sugar</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
               placeholder="Enter blood sugar level"
               value={formData.BS}
               onChangeText={(value) => handleInputChange('BS', value)}
@@ -272,7 +263,7 @@ export default function PredictScreen({ navigation }) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Body Temperature</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
               placeholder="Enter body temperature"
               value={formData.BodyTemp}
               onChangeText={(value) => handleInputChange('BodyTemp', value)}
@@ -283,7 +274,7 @@ export default function PredictScreen({ navigation }) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Heart Rate</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
               placeholder="Enter heart rate"
               value={formData.HeartRate}
               onChangeText={(value) => handleInputChange('HeartRate', value)}
@@ -291,22 +282,14 @@ export default function PredictScreen({ navigation }) {
             />
           </View>
 
-          <TouchableOpacity
-            style={styles.predictButton}
-            onPress={handlePredict}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={themeColors.white} />
-            ) : (
-              <Text style={styles.predictButtonText}>Get Prediction</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+          <PrimaryButton onPress={handlePredict} loading={loading}>
+            Get Prediction
+          </PrimaryButton>
+      </Card>
 
         {prediction && (
-          <View style={styles.resultContainer}>
-            <Text style={styles.resultTitle}>Prediction Results</Text>
+          <Card>
+            <Title style={{ fontSize: 20, marginBottom: 15 }}>Prediction Results</Title>
             
             <RiskMeter riskLevel={prediction.Predicted_Risk} />
             
@@ -316,91 +299,40 @@ export default function PredictScreen({ navigation }) {
                 styles.riskValue,
                 { 
                   color: prediction.Predicted_Risk?.toLowerCase().includes('high') 
-                    ? themeColors.error 
+                    ? '#dc3545' 
                     : prediction.Predicted_Risk?.toLowerCase().includes('medium') 
-                      ? themeColors.warning 
-                      : themeColors.success 
+                      ? '#ffc107' 
+                      : '#28a745' 
                 }
               ]}>
                 {prediction.Predicted_Risk || 'Unknown'}
               </Text>
             </View>
-            <Text style={styles.recommendationTitle}>Recommendations:</Text>
-            <Text style={styles.recommendationText}>
+            <Subtitle style={{ marginBottom: 10 }}>Recommendations:</Subtitle>
+            <Text style={[styles.recommendationText, { color: theme.text }]}>
               {prediction.Recommendation}
             </Text>
-          </View>
+          </Card>
         )}
-      </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: themeColors.lightBackground,
-  },
-  content: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: themeColors.darkText,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: themeColors.placeholder,
-    marginBottom: 30,
-  },
-  form: {
-    backgroundColor: themeColors.white,
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 20,
-  },
+  // Container/layout comes from Screen and Card
   inputContainer: {
     marginBottom: 15,
   },
   label: {
     fontSize: 16,
-    color: themeColors.darkText,
+    color: '#1E1E1E',
     marginBottom: 5,
   },
   input: {
-    backgroundColor: themeColors.lightBackground,
     borderRadius: 10,
     padding: 12,
     fontSize: 16,
-    color: themeColors.text,
     borderWidth: 1,
-    borderColor: themeColors.lightPrimary,
-  },
-  predictButton: {
-    backgroundColor: themeColors.primary,
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  predictButtonText: {
-    color: themeColors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  resultContainer: {
-    backgroundColor: themeColors.white,
-    borderRadius: 15,
-    padding: 20,
-    marginTop: 20,
-  },
-  resultTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: themeColors.darkText,
-    marginBottom: 15,
   },
   riskContainer: {
     flexDirection: 'row',
@@ -409,7 +341,7 @@ const styles = StyleSheet.create({
   },
   riskLabel: {
     fontSize: 16,
-    color: themeColors.darkText,
+    color: '#1E1E1E',
     marginRight: 10,
   },
   riskValue: {
@@ -419,12 +351,11 @@ const styles = StyleSheet.create({
   recommendationTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: themeColors.darkText,
+    color: '#1E1E1E',
     marginBottom: 10,
   },
   recommendationText: {
     fontSize: 14,
-    color: themeColors.text,
     lineHeight: 20,
   },
   riskMeterContainer: {
@@ -446,7 +377,7 @@ const styles = StyleSheet.create({
     lineHeight: undefined,
   },
   riskMeterPoints: {
-    color: themeColors.placeholder,
+    color: '#A0A0A0',
     marginTop: 8,
     textAlign: 'center',
   },

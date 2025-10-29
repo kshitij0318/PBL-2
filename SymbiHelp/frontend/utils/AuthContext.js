@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from './config';
+import NotificationService from './NotificationService';
 
 // Create the auth context
 const AuthContext = createContext();
@@ -123,7 +124,29 @@ export const AuthProvider = ({ children }) => {
   // Handle Sign Out
   const signOut = async () => {
     try {
+      // Unregister push token before signing out
+      const token = userInfo?.token;
+      if (token) {
+        try {
+          const pushToken = await NotificationService.getStoredToken();
+          if (pushToken) {
+            await fetch(`${API_URL}/notifications/unregister-token`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({ push_token: pushToken }),
+            });
+          }
+        } catch (error) {
+          console.error('Error unregistering push token:', error);
+          // Continue with sign out even if token unregistration fails
+        }
+      }
+
       await AsyncStorage.removeItem('userInfo');
+      await AsyncStorage.removeItem('expoPushToken');
       setUserInfo(null);
     } catch (error) {
       console.error('Sign out error:', error);

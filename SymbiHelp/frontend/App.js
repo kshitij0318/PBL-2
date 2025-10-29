@@ -1,10 +1,11 @@
 // Remove fast-refresh import
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform, View, Text, LogBox, StyleSheet, ActivityIndicator, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import NotificationService from './utils/NotificationService';
 
 // Screen Imports
 import SignUpScreen from './screens/SignUpScreen';
@@ -229,6 +230,28 @@ function MainTabNavigator() {
 function Navigation() {
   const { userInfo, loading } = useAuth();
   const { theme } = useTheme();
+  const navigationRef = useRef(null);
+
+  // Setup notifications when user is logged in
+  useEffect(() => {
+    if (userInfo && userInfo.token) {
+      // Setup notification listeners
+      NotificationService.setupNotificationListeners(navigationRef.current);
+
+      // Register for push notifications
+      NotificationService.registerForPushNotifications().then(token => {
+        if (token) {
+          // Register token with backend
+          NotificationService.registerTokenWithBackend(token, userInfo.token);
+        }
+      });
+
+      // Cleanup on unmount
+      return () => {
+        NotificationService.cleanup();
+      };
+    }
+  }, [userInfo]);
 
   if (loading) {
     return <LoadingScreen />;
@@ -237,7 +260,7 @@ function Navigation() {
   console.log('[App.js Navigation] UserInfo:', userInfo);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Suspense fallback={<LoadingScreen />}>
         <Stack.Navigator 
           screenOptions={{ 

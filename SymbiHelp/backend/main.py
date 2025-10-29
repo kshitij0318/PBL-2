@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError, OperationalError
 from functools import wraps
 import logging
+import requests
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -106,6 +107,19 @@ class TestScore(db.Model):
 
     def __repr__(self):
         return f"<TestScore {self.id} for User {self.user_id}>"
+
+class PushToken(db.Model):
+    __tablename__ = 'push_tokens'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    push_token = db.Column(db.String(255), nullable=False)
+    platform = db.Column(db.String(50), nullable=False)  # 'ios', 'android', 'web'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    user = db.relationship('User', backref='push_tokens')
+
+    def __repr__(self):
+        return f"<PushToken {self.id} for User {self.user_id}>"
 
 # Load the scaler and model
 try:
@@ -745,6 +759,170 @@ def get_all_users():
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving user list: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+# Push Notification Endpoints
+@app.route('/notifications/register-token', methods=['POST'])
+@require_auth
+def register_push_token():
+    try:
+        data = request.get_json()
+        if not data or 'push_token' not in data:
+            return jsonify({
+                'status': 'error',
+                'message': 'push_token is required'
+            }), HTTPStatus.BAD_REQUEST
+
+        push_token = data['push_token']
+        platform = data.get('platform', 'unknown')
+
+        # Check if token already exists for this user
+        existing_token = PushToken.query.filter_by(
+            user_id=request.user_id,
+            push_token=push_token
+        ).first()
+
+        if existing_token:
+            # Update platform and timestamp
+            existing_token.platform = platform
+            existing_token.updated_at = datetime.utcnow()
+            db.session.commit()
+            logger.info(f"Updated push token for user_id {request.user_id}")
+        else:
+            # Create new token
+            new_token = PushToken(
+                user_id=request.user_id,
+                push_token=push_token,
+                platform=platform
+            )
+            db.session.add(new_token)
+            db.session.commit()
+            logger.info(f"Registered push token for user_id {request.user_id}")
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Push token registered successfully'
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error registering push token: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error registering push token: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/notifications/send', methods=['POST'])
+@require_auth
+def send_push_notification():
+    try:
+        user = User.query.get(request.user_id)
+        if not user or not user.is_admin:
+            return jsonify({
+                'status': 'error',
+                'message': 'Unauthorized access'
+            }), HTTPStatus.FORBIDDEN
+
+        data = request.get_json()
+        if not data or 'title' not in data or 'body' not in data:
+            return jsonify({
+                'status': 'error',
+                'message': 'title and body are required'
+            }), HTTPStatus.BAD_REQUEST
+
+        title = data['title']
+        body = data['body']
+        user_ids = data.get('user_ids', [])  # Empty list means send to all users
+        data_payload = data.get('data', {})  # Additional data for deep linking
+
+        # Get push tokens
+        if user_ids:
+            tokens = PushToken.query.filter(PushToken.user_id.in_(user_ids)).all()
+        else:
+            tokens = PushToken.query.all()
+
+        if not tokens:
+            return jsonify({
+                'status': 'error',
+                'message': 'No push tokens found'
+            }), HTTPStatus.BAD_REQUEST
+
+        # Prepare notification payload
+        push_tokens = [token.push_token for token in tokens]
+        
+        # Send notifications via Expo Push Notification Service
+        messages = [{
+            'to': token,
+            'sound': 'default',
+            'title': title,
+            'body': body,
+            'data': data_payload,
+            'badge': 1,
+        } for token in push_tokens]
+
+        # Expo Push Notification API endpoint
+        expo_push_url = 'https://exp.host/--/api/v2/push/send'
+        
+        response = requests.post(expo_push_url, json=messages, headers={
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip, deflate'
+        })
+
+        if response.status_code == 200:
+            results = response.json().get('data', [])
+            success_count = sum(1 for r in results if r.get('status') == 'ok')
+            
+            logger.info(f"Sent {success_count}/{len(messages)} push notifications")
+            return jsonify({
+                'status': 'success',
+                'message': f'Sent {success_count} notifications',
+                'results': results
+            }), HTTPStatus.OK
+        else:
+            logger.error(f"Failed to send push notifications: {response.text}")
+            return jsonify({
+                'status': 'error',
+                'message': 'Failed to send push notifications'
+            }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    except Exception as e:
+        logger.error(f"Error sending push notification: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error sending push notification: {str(e)}'
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/notifications/unregister-token', methods=['POST'])
+@require_auth
+def unregister_push_token():
+    try:
+        data = request.get_json()
+        push_token = data.get('push_token')
+
+        if push_token:
+            PushToken.query.filter_by(
+                user_id=request.user_id,
+                push_token=push_token
+            ).delete()
+        else:
+            # Remove all tokens for this user
+            PushToken.query.filter_by(user_id=request.user_id).delete()
+
+        db.session.commit()
+        logger.info(f"Unregistered push token(s) for user_id {request.user_id}")
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Push token unregistered successfully'
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error unregistering push token: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error unregistering push token: {str(e)}'
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
 if __name__ == '__main__':

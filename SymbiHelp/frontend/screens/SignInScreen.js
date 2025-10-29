@@ -14,18 +14,9 @@ import {
 } from 'react-native';
 import { useAuth } from '../utils/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-
-// Theme colors
-const themeColors = {
-  primary: '#7A7FFC',
-  lightPrimary: '#E8E9FF',
-  lightBackground: '#F0F4FF',
-  white: '#FFFFFF',
-  text: '#333',
-  darkText: '#1E1E1E',
-  placeholder: '#A0A0A0',
-  error: '#dc3545',
-};
+import { useTheme } from '../utils/ThemeContext';
+import PrimaryButton from '../components/PrimaryButton';
+import Card from '../components/Card';
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -33,6 +24,7 @@ export default function SignInScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn } = useAuth();
+  const { theme } = useTheme();
 
   const handleSignIn = async () => {
     console.log('Step 1: Validating input fields...');
@@ -66,7 +58,7 @@ export default function SignInScreen({ navigation }) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.lightBackground }]}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -74,16 +66,17 @@ export default function SignInScreen({ navigation }) {
       >
         <View style={styles.contentContainer}>
           <View style={styles.header}>
-            <Text style={styles.title}>Welcome to SymbiHelp</Text>
-            <Text style={styles.subtitle}>Sign in to continue</Text>
+            <Text style={[styles.title, { color: theme.darkText }]}>Welcome to SymbiHelp</Text>
+            <Text style={[styles.subtitle, { color: theme.placeholder }]}>Sign in to continue</Text>
           </View>
 
-          <View style={styles.form}>
+          <Card style={styles.form}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={[styles.label, { color: theme.darkText }]}>Email</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.lightBackground, color: theme.text }]}
                 placeholder="Enter your email"
+                placeholderTextColor={theme.placeholder}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -93,11 +86,12 @@ export default function SignInScreen({ navigation }) {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.passwordContainer}>
+              <Text style={[styles.label, { color: theme.darkText }]}>Password</Text>
+              <View style={[styles.passwordContainer, { backgroundColor: theme.lightBackground }] }>
                 <TextInput
-                  style={styles.passwordInput}
+                  style={[styles.passwordInput, { color: theme.text }]}
                   placeholder="Enter your password"
+                  placeholderTextColor={theme.placeholder}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
@@ -110,31 +104,23 @@ export default function SignInScreen({ navigation }) {
                   <Ionicons
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={24}
-                    color={themeColors.placeholder}
+                    color={theme.placeholder}
                   />
                 </TouchableOpacity>
               </View>
             </View>
 
-            <TouchableOpacity
-              style={[styles.button, loading && styles.buttonDisabled]}
-              onPress={handleSignIn}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size={24} color={themeColors.white} />
-              ) : (
-                <Text style={styles.buttonText}>Sign In</Text>
-              )}
-            </TouchableOpacity>
+            <PrimaryButton onPress={handleSignIn} loading={loading} style={{ marginTop: 6 }}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </PrimaryButton>
 
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Don't have an account? </Text>
+              <Text style={[styles.footerText, { color: theme.placeholder }]}>Don't have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                <Text style={styles.footerLink}>Sign Up</Text>
+                <Text style={[styles.footerLink, { color: theme.primary }]}>Sign Up</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </Card>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -144,7 +130,6 @@ export default function SignInScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: themeColors.lightBackground,
   },
   scrollContent: {
     flexGrow: 1,
@@ -161,88 +146,55 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: themeColors.darkText,
+    fontSize: 30,
+    fontWeight: '700',
     marginBottom: 10,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: themeColors.placeholder,
+    fontSize: 15,
     textAlign: 'center',
   },
   form: {
-    backgroundColor: themeColors.white,
-    borderRadius: 15,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 440,
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
-    color: themeColors.darkText,
+    fontSize: 15,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: themeColors.lightBackground,
     borderRadius: 10,
     padding: 12,
     fontSize: 16,
-    color: themeColors.text,
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: themeColors.lightBackground,
     borderRadius: 10,
   },
   passwordInput: {
     flex: 1,
     padding: 12,
     fontSize: 16,
-    color: themeColors.text,
+    color: '#000',
   },
   eyeIcon: {
     padding: 12,
   },
-  button: {
-    backgroundColor: themeColors.primary,
-    borderRadius: 10,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: themeColors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  // Primary button uses shared component
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 20,
   },
   footerText: {
-    color: themeColors.placeholder,
     fontSize: 14,
   },
   footerLink: {
-    color: themeColors.primary,
     fontSize: 14,
     fontWeight: '600',
   }

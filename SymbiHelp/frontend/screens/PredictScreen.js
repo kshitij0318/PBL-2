@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
+import { Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle, Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,6 +22,7 @@ import Screen from '../components/Screen';
 import { Title, Subtitle } from '../components/ThemedText';
 import { useToast } from '../utils/ToastContext';
 import Skeleton, { SkeletonBlock } from '../components/Skeleton';
+import NotificationService from '../utils/NotificationService';
 
 // Remove local theme; use global theme via useTheme
 
@@ -201,6 +203,44 @@ export default function PredictScreen({ navigation }) {
     }
   };
 
+  const handleShare = async () => {
+    if (!prediction) return;
+    try {
+      const message = `SymbiHelp Prediction\nRisk Level: ${prediction.Predicted_Risk}\nRecommendations: ${prediction.Recommendation}`;
+      await Share.share({ message });
+    } catch (e) {
+      show('Unable to open share sheet', { type: 'error', duration: 2500 });
+    }
+  };
+
+  const scheduleReminder = async () => {
+    try {
+      await NotificationService.scheduleLocalNotification(
+        'Time to log your vitals',
+        'Open SymbiHelp to check your risk and stay on track.',
+        { screen: 'Predict' },
+        { seconds: 24 * 60 * 60 }
+      );
+      show('Reminder set for 24 hours from now', { type: 'success', duration: 2500 });
+    } catch (e) {
+      show('Could not schedule reminder', { type: 'error', duration: 2500 });
+    }
+  };
+
+  const scheduleDailyPreset = async (hour) => {
+    try {
+      await NotificationService.scheduleLocalNotification(
+        'Daily vitals reminder',
+        'Log your vitals and get your risk update.',
+        { screen: 'Predict' },
+        { hour, minute: 0, repeats: true }
+      );
+      show(`Daily reminder set for ${hour}:00`, { type: 'success', duration: 2500 });
+    } catch (e) {
+      show('Could not set daily reminder', { type: 'error', duration: 2500 });
+    }
+  };
+
   return (
     <Screen>
       <Title>Health Risk Prediction</Title>
@@ -371,6 +411,30 @@ export default function PredictScreen({ navigation }) {
             <Text style={[styles.recommendationText, { color: theme.text }]}>
               {prediction.Recommendation}
             </Text>
+
+            <View style={{ flexDirection: 'row', marginTop: 16 }}>
+              <PrimaryButton variant="outline" style={{ marginRight: 10 }} onPress={handleShare}>
+                Share
+              </PrimaryButton>
+              <PrimaryButton variant="ghost" onPress={scheduleReminder}>
+                Remind me in 24h
+              </PrimaryButton>
+            </View>
+
+            <View style={{ marginTop: 12 }}>
+              <Text style={{ fontSize: 12, color: theme.secondaryText, marginBottom: 6 }}>Set a daily reminder</Text>
+              <View style={{ flexDirection: 'row' }}>
+                <PrimaryButton variant="outline" size="sm" style={{ marginRight: 8 }} onPress={() => scheduleDailyPreset(8)}>
+                  8 AM
+                </PrimaryButton>
+                <PrimaryButton variant="outline" size="sm" style={{ marginRight: 8 }} onPress={() => scheduleDailyPreset(14)}>
+                  2 PM
+                </PrimaryButton>
+                <PrimaryButton variant="outline" size="sm" onPress={() => scheduleDailyPreset(20)}>
+                  8 PM
+                </PrimaryButton>
+              </View>
+            </View>
           </Card>
         )}
     </Screen>

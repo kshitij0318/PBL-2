@@ -1,5 +1,5 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
+import React, { useRef } from 'react';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View, Animated } from 'react-native';
 import { useTheme } from '../utils/ThemeContext';
 
 export default function PrimaryButton({
@@ -14,6 +14,29 @@ export default function PrimaryButton({
   fullWidth = false,
   rightIcon,
 }) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 5,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 5,
+    }).start();
+  };
+
+  const handlePress = () => {
+    onPress && onPress();
+  };
   const { theme } = useTheme();
   const bgByVariant = {
     primary: theme.primary,
@@ -34,33 +57,37 @@ export default function PrimaryButton({
   const fontBySize = { sm: 14, md: 16, lg: 18 };
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={onPress}
-      disabled={disabled || loading}
-      style={[
-        styles.button,
-        {
-          backgroundColor: bgByVariant[variant] || theme.primary,
-          borderColor: borderByVariant[variant] || 'transparent',
-          borderWidth: variant === 'outline' ? 1.5 : 0,
-          paddingVertical: paddingYBySize[size] ?? 14,
-          shadowColor: theme.shadowColor,
-          width: fullWidth ? '100%' : undefined,
-        },
-        style,
-      ]}
-    >
-      {loading ? (
-        <ActivityIndicator color={textByVariant[variant] || theme.white} />
-      ) : (
-        <View style={styles.content}>
-          {icon}
-          <Text style={[styles.text, { color: textByVariant[variant] || theme.white, fontSize: fontBySize[size] ?? 16 }]}>{children}</Text>
-          {rightIcon}
-        </View>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled || loading}
+        style={[
+          styles.button,
+          {
+            backgroundColor: bgByVariant[variant] || theme.primary,
+            borderColor: borderByVariant[variant] || 'transparent',
+            borderWidth: variant === 'outline' ? 1.5 : 0,
+            paddingVertical: paddingYBySize[size] ?? 14,
+            shadowColor: theme.shadowColor,
+            width: fullWidth ? '100%' : undefined,
+          },
+          style,
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator color={textByVariant[variant] || theme.white} />
+        ) : (
+          <View style={styles.content}>
+            {icon}
+            <Text style={[styles.text, { color: textByVariant[variant] || theme.white, fontSize: fontBySize[size] ?? 16 }]}>{children}</Text>
+            {rightIcon}
+          </View>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 

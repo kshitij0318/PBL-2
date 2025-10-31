@@ -1,6 +1,6 @@
 // src/screens/ProgressScreen.js
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView, ActivityIndicator, StatusBar, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { View, Text, FlatList, StyleSheet, SafeAreaView, ActivityIndicator, StatusBar, TouchableOpacity, Image } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { getHistory } from '../utils/ProgressManager';
 import { Ionicons } from '@expo/vector-icons';
@@ -81,12 +81,62 @@ const ProgressScreen = ({ navigation }) => {
     </View>
   );
 
+  const { streak, totalDaysActive, totalTests, topBadge } = useMemo(() => {
+    if (!history || history.length === 0) {
+      return { streak: 0, totalDaysActive: 0, totalTests: 0, topBadge: null };
+    }
+    const days = new Set(history.map(h => new Date(h.date).toDateString()));
+    const totalDays = days.size;
+    const sortedDays = Array.from(days).map(d => new Date(d)).sort((a,b) => b - a);
+    let s = 0;
+    let cursor = new Date();
+    cursor.setHours(0,0,0,0);
+    for (let i = 0; i < sortedDays.length; i++) {
+      const d = new Date(sortedDays[i]);
+      d.setHours(0,0,0,0);
+      if (d.toDateString() === cursor.toDateString()) {
+        s += 1;
+        cursor.setDate(cursor.getDate() - 1);
+      } else if (i === 0 && d.toDateString() === new Date(new Date().setDate(new Date().getDate()-1)).toDateString()) {
+        // No activity today but yesterday active: streak counts from yesterday
+        s += 1;
+        cursor = new Date(new Date().setDate(new Date().getDate()-2));
+      } else {
+        break;
+      }
+    }
+    const tests = history.length;
+    const badge = s >= 7 ? { label: '7‑Day Streak', icon: 'flame' } : s >= 3 ? { label: '3‑Day Streak', icon: 'flame-outline' } : tests >= 10 ? { label: '10 Tests', icon: 'trophy-outline' } : null;
+    return { streak: s, totalDaysActive: totalDays, totalTests: tests, topBadge: badge };
+  }, [history]);
+
   const renderHeader = () => (
     <View style={[styles.headerContainer, { backgroundColor: theme.headerBackground }]}>
+      <View style={styles.metricsRow}>
+        <View style={[styles.metricCard, { borderColor: theme.cardBorder, backgroundColor: theme.cardBackground }]}>
+          <Ionicons name="flame" size={20} color={theme.primary} />
+          <Text style={[styles.metricValue, { color: theme.darkText }]}>{streak}d</Text>
+          <Text style={[styles.metricLabel, { color: theme.secondaryText }]}>Streak</Text>
+        </View>
+        <View style={[styles.metricCard, { borderColor: theme.cardBorder, backgroundColor: theme.cardBackground }]}>
+          <Ionicons name="calendar" size={20} color={theme.primary} />
+          <Text style={[styles.metricValue, { color: theme.darkText }]}>{totalDaysActive}</Text>
+          <Text style={[styles.metricLabel, { color: theme.secondaryText }]}>Active days</Text>
+        </View>
+        <View style={[styles.metricCard, { borderColor: theme.cardBorder, backgroundColor: theme.cardBackground }]}>
+          <Ionicons name="trophy" size={20} color={theme.primary} />
+          <Text style={[styles.metricValue, { color: theme.darkText }]}>{totalTests}</Text>
+          <Text style={[styles.metricLabel, { color: theme.secondaryText }]}>Tests</Text>
+        </View>
+      </View>
+      {topBadge && (
+        <View style={[styles.badgeContainer, { borderColor: theme.cardBorder, backgroundColor: theme.cardBackground }]}>
+          <Ionicons name={topBadge.icon} size={18} color={theme.primary} />
+          <Text style={[styles.badgeText, { color: theme.darkText }]}>{topBadge.label}</Text>
+        </View>
+      )}
       <Text style={[styles.header, { color: theme.darkText }]}>Test History</Text>
-      <Text style={[styles.subHeader, { color: theme.secondaryText }]}>
-        Track your knowledge assessment progress
-      </Text>
+      <Text style={[styles.subHeader, { color: theme.secondaryText }]}>Track your knowledge assessment progress</Text>
     </View>
   );
 
@@ -152,13 +202,15 @@ const ProgressScreen = ({ navigation }) => {
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
-            <Ionicons name="cloud-offline-outline" size={60} color={theme.secondaryText} />
-            <Text style={[styles.emptyText, { color: theme.darkText }]}>
-              No test history found.
-            </Text>
-            <Text style={[styles.emptySubText, { color: theme.secondaryText }]}>
-              Complete a knowledge assessment test to see your progress here.
-            </Text>
+            <Image source={require('../assets/icon.png')} style={{ width: 88, height: 88, opacity: 0.9 }} />
+            <Text style={[styles.emptyText, { color: theme.darkText }]}>No test history yet</Text>
+            <Text style={[styles.emptySubText, { color: theme.secondaryText }]}>Complete a knowledge test to see your progress here.</Text>
+            <TouchableOpacity 
+              style={[styles.retryButton, { backgroundColor: theme.primary, marginTop: 16 }]}
+              onPress={() => navigation.navigate('Test')}
+            >
+              <Text style={styles.retryButtonText}>Start a Test</Text>
+            </TouchableOpacity>
           </View>
         )}
         contentContainerStyle={styles.listContentContainer}
@@ -186,6 +238,43 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     padding: 20,
+  },
+  metricsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  metricCard: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginRight: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  metricValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 6,
+  },
+  metricLabel: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  badgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    marginBottom: 10,
+  },
+  badgeText: {
+    marginLeft: 6,
+    fontSize: 12,
+    fontWeight: '600',
   },
   header: {
     fontSize: 28,

@@ -27,6 +27,7 @@ import { AuthProvider, useAuth } from './utils/AuthContext';
 import { ThemeProvider, useTheme } from './utils/ThemeContext';
 import { ToastProvider } from './utils/ToastContext';
 import { DefaultToast } from './components/Toast';
+import TabBarButton from './components/TabBarButton';
 
 // Ignore specific warnings
 LogBox.ignoreLogs([
@@ -184,6 +185,7 @@ function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarButton: (props) => <TabBarButton {...props} />,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'HomeTab') {

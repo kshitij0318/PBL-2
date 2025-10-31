@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'; // Import useMemo
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,10 @@ import {
   ScrollView,
   SafeAreaView,
   Alert,
-  // Image, // <-- Removed unused import
+  Animated,
 } from 'react-native';
+import FadeInView from '../components/FadeInView';
+import SlideInView from '../components/SlideInView';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
@@ -76,30 +78,36 @@ export default function HomeScreen({ navigation }) {
         </View>
 
         <View style={styles.quickRow}>
-          <TouchableOpacity
-            style={styles.quickCard}
-            activeOpacity={0.85}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('Predict'); }}
-          >
-            <Ionicons name="pulse" size={22} color={theme.primary} />
-            <Text style={styles.quickText}>Predict</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCard}
-            activeOpacity={0.85}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('CommunityForum'); }}
-          >
-            <Ionicons name="people" size={22} color={theme.primary} />
-            <Text style={styles.quickText}>Community</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCard}
-            activeOpacity={0.85}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('ProgressTab'); }}
-          >
-            <Ionicons name="bar-chart" size={22} color={theme.primary} />
-            <Text style={styles.quickText}>Progress</Text>
-          </TouchableOpacity>
+          <SlideInView from="left" delay={100}>
+            <TouchableOpacity
+              style={styles.quickCard}
+              activeOpacity={0.85}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('Predict'); }}
+            >
+              <Ionicons name="pulse" size={22} color={theme.primary} />
+              <Text style={styles.quickText}>Predict</Text>
+            </TouchableOpacity>
+          </SlideInView>
+          <SlideInView from="left" delay={200}>
+            <TouchableOpacity
+              style={styles.quickCard}
+              activeOpacity={0.85}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('CommunityForum'); }}
+            >
+              <Ionicons name="people" size={22} color={theme.primary} />
+              <Text style={styles.quickText}>Community</Text>
+            </TouchableOpacity>
+          </SlideInView>
+          <SlideInView from="left" delay={300}>
+            <TouchableOpacity
+              style={styles.quickCard}
+              activeOpacity={0.85}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('ProgressTab'); }}
+            >
+              <Ionicons name="bar-chart" size={22} color={theme.primary} />
+              <Text style={styles.quickText}>Progress</Text>
+            </TouchableOpacity>
+          </SlideInView>
         </View>
       </LinearGradient>
 
@@ -109,29 +117,29 @@ export default function HomeScreen({ navigation }) {
             Techniques
           </Text>
           <View style={styles.grid}>
-            {techniques.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.cardWrapper}
-                onPress={() => navigation.navigate(item.screen)}
-                activeOpacity={0.7}
-                // <-- Accessibility improvements
-                accessibilityLabel={item.name}
-                accessibilityHint={item.description}
-                accessibilityRole="button"
-              >
-                <View style={[styles.card, { backgroundColor: item.color }]}>
-                  <View style={styles.iconContainer}>
-                    <Ionicons name={item.icon} size={28} color="#FFFFFF" />
+            {techniques.map((item, index) => (
+              <FadeInView key={item.id} delay={400 + (index * 100)}>
+                <TouchableOpacity
+                  style={styles.cardWrapper}
+                  onPress={() => navigation.navigate(item.screen)}
+                  activeOpacity={0.7}
+                  accessibilityLabel={item.name}
+                  accessibilityHint={item.description}
+                  accessibilityRole="button"
+                >
+                  <View style={[styles.card, { backgroundColor: item.color }]}>
+                    <View style={styles.iconContainer}>
+                      <Ionicons name={item.icon} size={28} color="#FFFFFF" />
+                    </View>
+                    <Text style={styles.cardTitle}>
+                      {item.name}
+                    </Text>
+                    <Text style={styles.cardDescription}>
+                      {item.description}
+                    </Text>
                   </View>
-                  <Text style={styles.cardTitle}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.cardDescription}>
-                    {item.description}
-                  </Text>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </FadeInView>
             ))}
           </View>
         </View>

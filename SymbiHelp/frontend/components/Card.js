@@ -1,13 +1,18 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '../utils/ThemeContext';
 
-export default function Card({ children, style }) {
+export default function Card({ children, style, pressable = false, onPress }) {
   const { theme } = useTheme();
+  const Container = pressable ? TouchableOpacity : View;
   return (
-    <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.cardBorder }, style]}>
+    <Container
+      activeOpacity={pressable ? 0.85 : 1}
+      onPress={pressable ? onPress : undefined}
+      style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.cardBorder }, style]}
+    >
       {children}
-    </View>
+    </Container>
   );
 }
 

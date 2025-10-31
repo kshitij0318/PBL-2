@@ -19,6 +19,8 @@ import Card from '../components/Card';
 import PrimaryButton from '../components/PrimaryButton';
 import Screen from '../components/Screen';
 import { Title, Subtitle } from '../components/ThemedText';
+import { useToast } from '../utils/ToastContext';
+import Skeleton, { SkeletonBlock } from '../components/Skeleton';
 
 // Remove local theme; use global theme via useTheme
 
@@ -101,6 +103,8 @@ const RiskMeter = ({ riskLevel }) => {
 
 export default function PredictScreen({ navigation }) {
   const { theme } = useTheme();
+  const { show } = useToast();
+  const [focused, setFocused] = useState(null);
   const [formData, setFormData] = useState({
     Age: '',
     SystolicBP: '',
@@ -185,26 +189,13 @@ export default function PredictScreen({ navigation }) {
         });
         
         // Show success message with recommendation
-        Alert.alert(
-          'Prediction Complete',
-          `Risk Level: ${data.prediction}\n\n${data.recommendation || 'No recommendations available'}`,
-          [
-            {
-              text: 'View History',
-              onPress: () => navigation.navigate('Progress')
-            },
-            {
-              text: 'OK',
-              style: 'cancel'
-            }
-          ]
-        );
+        show(`Prediction: ${data.prediction}`, { duration: 2500, type: 'success' });
       } else {
-        Alert.alert('Error', data.message || 'Failed to get prediction');
+        show('Failed to get prediction', { duration: 2500, type: 'error' });
       }
     } catch (error) {
       console.error('Prediction error:', error);
-      Alert.alert('Error', 'Failed to connect to prediction service. Please try again later.');
+      show('Connection error. Please try again later.', { duration: 2500, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -219,75 +210,143 @@ export default function PredictScreen({ navigation }) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Age</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.lightBackground,
+                  borderColor: focused === 'Age' ? theme.primary : theme.lightPrimary,
+                  color: theme.text,
+                },
+              ]}
               placeholder="Enter your age"
               value={formData.Age}
               onChangeText={(value) => handleInputChange('Age', value)}
+              onFocus={() => setFocused('Age')}
+              onBlur={() => setFocused(null)}
               keyboardType="numeric"
             />
+            <Text style={[styles.hint, { color: theme.placeholder }]}>Typical range: 18–50</Text>
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Systolic Blood Pressure</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.lightBackground,
+                  borderColor: focused === 'SystolicBP' ? theme.primary : theme.lightPrimary,
+                  color: theme.text,
+                },
+              ]}
               placeholder="Enter systolic BP"
               value={formData.SystolicBP}
               onChangeText={(value) => handleInputChange('SystolicBP', value)}
+              onFocus={() => setFocused('SystolicBP')}
+              onBlur={() => setFocused(null)}
               keyboardType="numeric"
             />
+            <Text style={[styles.hint, { color: theme.placeholder }]}>Typical range: 90–120 mmHg</Text>
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Diastolic Blood Pressure</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.lightBackground,
+                  borderColor: focused === 'DiastolicBP' ? theme.primary : theme.lightPrimary,
+                  color: theme.text,
+                },
+              ]}
               placeholder="Enter diastolic BP"
               value={formData.DiastolicBP}
               onChangeText={(value) => handleInputChange('DiastolicBP', value)}
+              onFocus={() => setFocused('DiastolicBP')}
+              onBlur={() => setFocused(null)}
               keyboardType="numeric"
             />
+            <Text style={[styles.hint, { color: theme.placeholder }]}>Typical range: 60–80 mmHg</Text>
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Blood Sugar</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.lightBackground,
+                  borderColor: focused === 'BS' ? theme.primary : theme.lightPrimary,
+                  color: theme.text,
+                },
+              ]}
               placeholder="Enter blood sugar level"
               value={formData.BS}
               onChangeText={(value) => handleInputChange('BS', value)}
+              onFocus={() => setFocused('BS')}
+              onBlur={() => setFocused(null)}
               keyboardType="numeric"
             />
+            <Text style={[styles.hint, { color: theme.placeholder }]}>Typical fasting: 70–100 mg/dL</Text>
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Body Temperature</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.lightBackground,
+                  borderColor: focused === 'BodyTemp' ? theme.primary : theme.lightPrimary,
+                  color: theme.text,
+                },
+              ]}
               placeholder="Enter body temperature"
               value={formData.BodyTemp}
               onChangeText={(value) => handleInputChange('BodyTemp', value)}
+              onFocus={() => setFocused('BodyTemp')}
+              onBlur={() => setFocused(null)}
               keyboardType="numeric"
             />
+            <Text style={[styles.hint, { color: theme.placeholder }]}>Typical range: 97–99°F (36.1–37.2°C)</Text>
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Heart Rate</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.lightBackground, borderColor: theme.lightPrimary, color: theme.text }]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.lightBackground,
+                  borderColor: focused === 'HeartRate' ? theme.primary : theme.lightPrimary,
+                  color: theme.text,
+                },
+              ]}
               placeholder="Enter heart rate"
               value={formData.HeartRate}
               onChangeText={(value) => handleInputChange('HeartRate', value)}
+              onFocus={() => setFocused('HeartRate')}
+              onBlur={() => setFocused(null)}
               keyboardType="numeric"
             />
+            <Text style={[styles.hint, { color: theme.placeholder }]}>Typical range: 60–100 bpm</Text>
           </View>
 
-          <PrimaryButton onPress={handlePredict} loading={loading}>
+          <PrimaryButton onPress={handlePredict} loading={loading} fullWidth>
             Get Prediction
           </PrimaryButton>
       </Card>
 
-        {prediction && (
+        {loading && (
+          <Card style={{ marginBottom: 12 }}>
+            <Skeleton width={160} height={22} style={{ marginBottom: 14 }} />
+            <Skeleton width={'100%'} height={140} radius={16} style={{ marginBottom: 16 }} />
+            <SkeletonBlock lines={3} />
+          </Card>
+        )}
+
+        {prediction && !loading && (
           <Card>
             <Title style={{ fontSize: 20, marginBottom: 15 }}>Prediction Results</Title>
             
@@ -333,6 +392,10 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     borderWidth: 1,
+  },
+  hint: {
+    fontSize: 12,
+    marginTop: 6,
   },
   riskContainer: {
     flexDirection: 'row',

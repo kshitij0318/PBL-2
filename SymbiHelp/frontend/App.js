@@ -25,6 +25,8 @@ import CommunityForumScreen from './screens/CommunityForumScreen';
 // Import AuthProvider and ThemeProvider
 import { AuthProvider, useAuth } from './utils/AuthContext';
 import { ThemeProvider, useTheme } from './utils/ThemeContext';
+import { ToastProvider } from './utils/ToastContext';
+import { DefaultToast } from './components/Toast';
 
 // Ignore specific warnings
 LogBox.ignoreLogs([
@@ -308,9 +310,13 @@ function Navigation() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Navigation />
-      </AuthProvider>
+      <ToastProvider renderDefault={(message, onClose) => (
+        <DefaultToast message={message} onClose={onClose} />
+      )}>
+        <AuthProvider>
+          <Navigation />
+        </AuthProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

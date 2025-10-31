@@ -10,6 +10,8 @@ import {
   // Image, // <-- Removed unused import
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '../utils/AuthContext';
 import { useTheme } from '../utils/ThemeContext';
 import { techniques } from '../constants/techniquesData'; // <-- Import data
@@ -39,40 +41,67 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.lightBackground }]}>
-      <View style={[
-          styles.header, 
-          { 
-            backgroundColor: theme.headerBackground,
-            borderBottomColor: theme.lightPrimary // <-- Added explicit border color
-          }
-      ]}>
-        <View style={styles.headerRow}>
+      <LinearGradient
+        colors={[theme.primary, isDarkMode ? '#4c4fdb' : '#9aa0ff']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.hero}
+      >
+        <View style={styles.heroHeaderRow}>
           <View style={styles.userSection}>
-            <Ionicons name="person-circle-outline" size={32} color={theme.primary} />
-            <Text style={[styles.welcomeText, { color: theme.darkText }]}>
-              Welcome, {welcomeName} {/* <-- Use the new variable */}
-            </Text>
+            <Ionicons name="person-circle-outline" size={34} color={theme.white} />
+            <View>
+              <Text style={[styles.heroHello, { color: theme.white }]}>Hello</Text>
+              <Text style={[styles.heroName, { color: theme.white }]}>{welcomeName}</Text>
+            </View>
           </View>
           <View style={styles.actionButtons}>
             <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: theme.lightPrimary }]}
-              onPress={toggleTheme}
+              style={[styles.iconButton, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); toggleTheme(); }}
             >
               <Ionicons
                 name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
                 size={22}
-                color={theme.primary}
+                color={theme.white}
               />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: theme.lightPrimary }]}
-              onPress={handleSignOut}
+              style={[styles.iconButton, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); handleSignOut(); }}
             >
-              <Ionicons name="log-out-outline" size={22} color={theme.primary} />
+              <Ionicons name="log-out-outline" size={22} color={theme.white} />
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+
+        <View style={styles.quickRow}>
+          <TouchableOpacity
+            style={styles.quickCard}
+            activeOpacity={0.85}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('Predict'); }}
+          >
+            <Ionicons name="pulse" size={22} color={theme.primary} />
+            <Text style={styles.quickText}>Predict</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCard}
+            activeOpacity={0.85}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('CommunityForum'); }}
+          >
+            <Ionicons name="people" size={22} color={theme.primary} />
+            <Text style={styles.quickText}>Community</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCard}
+            activeOpacity={0.85}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{}); navigation.navigate('ProgressTab'); }}
+          >
+            <Ionicons name="bar-chart" size={22} color={theme.primary} />
+            <Text style={styles.quickText}>Progress</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
@@ -115,13 +144,14 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  header: {
-    paddingVertical: 16,
+  hero: {
+    paddingTop: 22,
+    paddingBottom: 16,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    // borderBottomColor is now set dynamically inline
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
-  headerRow: {
+  heroHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -132,11 +162,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  welcomeText: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 10,
-  },
+  heroHello: { fontSize: 12, opacity: 0.9, marginLeft: 10 },
+  heroName: { fontSize: 20, fontWeight: '700', marginLeft: 10 },
   actionButtons: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -148,6 +175,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
+  },
+  quickRow: {
+    flexDirection: 'row',
+    marginTop: 14,
+  },
+  quickCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginRight: 10,
+  },
+  quickText: {
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2A2A2A',
   },
   content: {
     flex: 1,

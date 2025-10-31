@@ -2,22 +2,62 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
 import { useTheme } from '../utils/ThemeContext';
 
-export default function PrimaryButton({ children, onPress, style, loading, disabled, icon }) {
+export default function PrimaryButton({
+  children,
+  onPress,
+  style,
+  loading,
+  disabled,
+  icon,
+  variant = 'primary', // 'primary' | 'outline' | 'ghost'
+  size = 'md', // 'sm' | 'md' | 'lg'
+  fullWidth = false,
+  rightIcon,
+}) {
   const { theme } = useTheme();
+  const bgByVariant = {
+    primary: theme.primary,
+    outline: 'transparent',
+    ghost: 'transparent',
+  };
+  const borderByVariant = {
+    primary: 'transparent',
+    outline: theme.primary,
+    ghost: 'transparent',
+  };
+  const textByVariant = {
+    primary: theme.white,
+    outline: theme.primary,
+    ghost: theme.primary,
+  };
+  const paddingYBySize = { sm: 10, md: 14, lg: 18 };
+  const fontBySize = { sm: 14, md: 16, lg: 18 };
 
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={onPress}
       disabled={disabled || loading}
-      style={[styles.button, { backgroundColor: theme.primary, shadowColor: theme.shadowColor }, style]}
+      style={[
+        styles.button,
+        {
+          backgroundColor: bgByVariant[variant] || theme.primary,
+          borderColor: borderByVariant[variant] || 'transparent',
+          borderWidth: variant === 'outline' ? 1.5 : 0,
+          paddingVertical: paddingYBySize[size] ?? 14,
+          shadowColor: theme.shadowColor,
+          width: fullWidth ? '100%' : undefined,
+        },
+        style,
+      ]}
     >
       {loading ? (
-        <ActivityIndicator color={theme.white} />
+        <ActivityIndicator color={textByVariant[variant] || theme.white} />
       ) : (
         <View style={styles.content}>
           {icon}
-          <Text style={[styles.text, { color: theme.white }]}>{children}</Text>
+          <Text style={[styles.text, { color: textByVariant[variant] || theme.white, fontSize: fontBySize[size] ?? 16 }]}>{children}</Text>
+          {rightIcon}
         </View>
       )}
     </TouchableOpacity>
@@ -27,7 +67,6 @@ export default function PrimaryButton({ children, onPress, style, loading, disab
 const styles = StyleSheet.create({
   button: {
     borderRadius: 12,
-    paddingVertical: 14,
     paddingHorizontal: 18,
     alignItems: 'center',
     justifyContent: 'center',

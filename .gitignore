@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+backend/venv/
+backend/__pycache__/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+.env
+backend/.env
+frontend/.env
+*.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+.expo/
+.expo-shared/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# React Native
+.packager-info.json
+
+# EAS
+eas.json.local

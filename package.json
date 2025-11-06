@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@react-navigation/bottom-tabs": "^6.5.11",
+    "@react-navigation/native": "^6.1.9",
+    "@react-navigation/native-stack": "^6.9.17",
+    "expo": "^52.0.46",
+    "expo-secure-store": "^14.0.1",
+    "node-fetch": "^3.3.2",
+    "pip": "^0.0.1",
+    "socket.io-client": "^4.8.1"
+  }
+}

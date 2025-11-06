@@ -1,0 +1,494 @@
+{
+  "weeks": {
+    "1": {
+      "week": 1,
+      "title": "Conception",
+      "baby_development": "Fertilization occurs and the zygote begins to divide",
+      "baby_size": "0.1mm",
+      "baby_weight": "0g",
+      "milestones": ["Conception occurs", "Zygote formation", "Cell division begins"],
+      "tips": ["Start taking prenatal vitamins", "Schedule your first prenatal appointment", "Begin tracking your pregnancy"],
+      "health_focus": ["Folic acid intake", "Healthy diet", "Avoid alcohol and smoking"],
+      "risk_factors": ["Genetic conditions", "Maternal age", "Previous pregnancy complications"]
+    },
+    "2": {
+      "week": 2,
+      "title": "Implantation",
+      "baby_development": "The fertilized egg implants in the uterine wall",
+      "baby_size": "0.2mm",
+      "baby_weight": "0g",
+      "milestones": ["Implantation in uterus", "Placenta begins forming", "Hormone production starts"],
+      "tips": ["Continue prenatal vitamins", "Stay hydrated", "Get adequate rest"],
+      "health_focus": ["Proper nutrition", "Stress management", "Regular exercise"],
+      "risk_factors": ["Implantation failure", "Ectopic pregnancy", "Hormonal imbalances"]
+    },
+    "3": {
+      "week": 3,
+      "title": "Early Development",
+      "baby_development": "Neural tube begins to form, heart tissue develops",
+      "baby_size": "0.5mm",
+      "baby_weight": "0g",
+      "milestones": ["Neural tube formation", "Heart tissue development", "Basic cell layers form"],
+      "tips": ["Ensure adequate folic acid", "Avoid hot tubs and saunas", "Continue healthy lifestyle"],
+      "health_focus": ["Folic acid (600-800mcg daily)", "Iron-rich foods", "Regular prenatal care"],
+      "risk_factors": ["Neural tube defects", "Heart defects", "Nutritional deficiencies"]
+    },
+    "4": {
+      "week": 4,
+      "title": "Missed Period",
+      "baby_development": "Embryo is about the size of a poppy seed, major organs begin forming",
+      "baby_size": "1mm",
+      "baby_weight": "0g",
+      "milestones": ["Missed menstrual period", "Positive pregnancy test", "Major organs begin forming"],
+      "tips": ["Confirm pregnancy with doctor", "Start pregnancy journal", "Inform close family"],
+      "health_focus": ["Prenatal care initiation", "Healthy eating habits", "Avoid harmful substances"],
+      "risk_factors": ["Miscarriage risk", "Ectopic pregnancy", "Genetic abnormalities"]
+    },
+    "5": {
+      "week": 5,
+      "title": "Heartbeat Begins",
+      "baby_development": "Tiny heart begins beating, brain and spinal cord develop",
+      "baby_size": "2mm",
+      "baby_weight": "0g",
+      "milestones": ["Heart begins beating", "Brain development starts", "Spinal cord forms"],
+      "tips": ["Schedule first ultrasound", "Start pregnancy exercise routine", "Monitor symptoms"],
+      "health_focus": ["Cardiovascular health", "Brain development nutrients", "Spinal health"],
+      "risk_factors": ["Heart defects", "Neural tube defects", "Developmental delays"]
+    },
+    "6": {
+      "week": 6,
+      "title": "Major Organs Form",
+      "baby_development": "Lungs, liver, and kidneys begin developing, facial features emerge",
+      "baby_size": "4mm",
+      "baby_weight": "0g",
+      "milestones": ["Lung development begins", "Liver and kidneys form", "Facial features develop"],
+      "tips": ["Eat protein-rich foods", "Stay well-hydrated", "Get plenty of rest"],
+      "health_focus": ["Protein intake", "Organ development nutrients", "Adequate hydration"],
+      "risk_factors": ["Organ malformations", "Facial defects", "Growth restrictions"]
+    },
+    "7": {
+      "week": 7,
+      "title": "Rapid Growth",
+      "baby_development": "Baby doubles in size, arms and legs begin to form",
+      "baby_size": "8mm",
+      "baby_weight": "0g",
+      "milestones": ["Rapid size increase", "Limb buds appear", "Eyes develop"],
+      "tips": ["Continue healthy diet", "Start gentle exercises", "Monitor weight gain"],
+      "health_focus": ["Balanced nutrition", "Gentle exercise", "Weight management"],
+      "risk_factors": ["Growth restrictions", "Limb abnormalities", "Eye development issues"]
+    },
+    "8": {
+      "week": 8,
+      "title": "Moving Baby",
+      "baby_development": "Baby begins moving, though you can't feel it yet",
+      "baby_size": "16mm",
+      "baby_weight": "0g",
+      "milestones": ["First movements begin", "All major organs present", "Fingers and toes form"],
+      "tips": ["Start belly bonding", "Continue prenatal vitamins", "Stay active"],
+      "health_focus": ["Movement and exercise", "Nutrient absorption", "Emotional well-being"],
+      "risk_factors": ["Movement disorders", "Organ dysfunction", "Developmental delays"]
+    },
+    "9": {
+      "week": 9,
+      "title": "End of Embryonic Period",
+      "baby_development": "Baby is now called a fetus, all major structures are in place",
+      "baby_size": "23mm",
+      "baby_weight": "0g",
+      "milestones": ["Embryonic period ends", "Fetal period begins", "All major structures present"],
+      "tips": ["Celebrate this milestone", "Continue healthy habits", "Plan for second trimester"],
+      "health_focus": ["Stable development", "Continued nutrition", "Regular check-ups"],
+      "risk_factors": ["Major structural defects", "Growth problems", "Organ dysfunction"]
+    },
+    "10": {
+      "week": 10,
+      "title": "Fetal Period Begins",
+      "baby_development": "Baby's heart is fully formed and beating strongly",
+      "baby_size": "31mm",
+      "baby_weight": "0g",
+      "milestones": ["Fetal period begins", "Heart fully formed", "Genitals develop"],
+      "tips": ["Listen to baby's heartbeat", "Continue healthy lifestyle", "Plan gender reveal if desired"],
+      "health_focus": ["Cardiac health", "Hormonal balance", "Emotional stability"],
+      "risk_factors": ["Cardiac abnormalities", "Hormonal imbalances", "Genetic conditions"]
+    },
+    "11": {
+      "week": 11,
+      "title": "Hair and Nails",
+      "baby_development": "Baby's hair and nails begin to grow, bones harden",
+      "baby_size": "41mm",
+      "baby_weight": "0g",
+      "milestones": ["Hair and nails grow", "Bones begin hardening", "Baby can make sucking motions"],
+      "tips": ["Eat calcium-rich foods", "Continue protein intake", "Stay hydrated"],
+      "health_focus": ["Calcium for bones", "Protein for growth", "Hydration"],
+      "risk_factors": ["Bone development issues", "Growth restrictions", "Nutritional deficiencies"]
+    },
+    "12": {
+      "week": 12,
+      "title": "First Trimester Ends",
+      "baby_development": "Baby is fully formed, risk of miscarriage decreases significantly",
+      "baby_size": "54mm",
+      "baby_weight": "0g",
+      "milestones": ["First trimester ends", "Miscarriage risk decreases", "Baby fully formed"],
+      "tips": ["Announce pregnancy publicly", "Plan second trimester", "Continue healthy habits"],
+      "health_focus": ["Stable development", "Continued care", "Emotional well-being"],
+      "risk_factors": ["Late first trimester issues", "Growth problems", "Developmental delays"]
+    },
+    "13": {
+      "week": 13,
+      "title": "Second Trimester Begins",
+      "baby_development": "Baby's vocal cords develop, can make crying sounds",
+      "baby_size": "74mm",
+      "baby_weight": "0g",
+      "milestones": ["Second trimester begins", "Vocal cords develop", "Baby can make sounds"],
+      "tips": ["Enjoy reduced morning sickness", "Start pregnancy exercises", "Plan nursery"],
+      "health_focus": ["Energy levels", "Exercise routine", "Nutritional needs"],
+      "risk_factors": ["Second trimester complications", "Gestational diabetes", "Pre-eclampsia"]
+    },
+    "14": {
+      "week": 14,
+      "title": "Gender Reveal",
+      "baby_development": "Baby's gender can usually be determined by ultrasound",
+      "baby_size": "87mm",
+      "baby_weight": "0g",
+      "milestones": ["Gender can be determined", "Baby practices breathing", "Facial muscles develop"],
+      "tips": ["Schedule gender ultrasound", "Start planning nursery", "Continue healthy diet"],
+      "health_focus": ["Ultrasound appointments", "Planning and preparation", "Continued care"],
+      "risk_factors": ["Ultrasound limitations", "Gender determination errors", "Development issues"]
+    },
+    "15": {
+      "week": 15,
+      "title": "Movement Sensations",
+      "baby_development": "Baby begins moving more, some mothers may feel flutters",
+      "baby_size": "101mm",
+      "baby_weight": "0g",
+      "milestones": ["Increased movement", "Baby can hear sounds", "Taste buds develop"],
+      "tips": ["Start talking to baby", "Play music", "Continue healthy habits"],
+      "health_focus": ["Bonding activities", "Sensory development", "Emotional connection"],
+      "risk_factors": ["Movement concerns", "Hearing development", "Sensory issues"]
+    },
+    "16": {
+      "week": 16,
+      "title": "Growing Baby",
+      "baby_development": "Baby is growing rapidly, muscles are developing",
+      "baby_size": "116mm",
+      "baby_weight": "0g",
+      "milestones": ["Rapid growth period", "Muscle development", "Baby can make faces"],
+      "tips": ["Eat protein-rich foods", "Continue exercise", "Monitor weight gain"],
+      "health_focus": ["Protein intake", "Exercise routine", "Weight management"],
+      "risk_factors": ["Growth restrictions", "Muscle development issues", "Nutritional problems"]
+    },
+    "17": {
+      "week": 17,
+      "title": "Fat Development",
+      "baby_development": "Baby begins developing fat stores, skin becomes less transparent",
+      "baby_size": "130mm",
+      "baby_weight": "0g",
+      "milestones": ["Fat development begins", "Skin becomes opaque", "Baby practices sucking"],
+      "tips": ["Eat healthy fats", "Continue prenatal vitamins", "Stay hydrated"],
+      "health_focus": ["Healthy fats", "Vitamin intake", "Hydration"],
+      "risk_factors": ["Fat development issues", "Skin problems", "Nutritional deficiencies"]
+    },
+    "18": {
+      "week": 18,
+      "title": "Hearing Development",
+      "baby_development": "Baby's hearing is developing, can hear your heartbeat and voice",
+      "baby_size": "142mm",
+      "baby_weight": "0g",
+      "milestones": ["Hearing development", "Baby responds to sound", "Eyes can move"],
+      "tips": ["Talk to baby regularly", "Play gentle music", "Avoid loud noises"],
+      "health_focus": ["Auditory stimulation", "Gentle sounds", "Bonding activities"],
+      "risk_factors": ["Hearing problems", "Sensory development issues", "Communication delays"]
+    },
+    "19": {
+      "week": 19,
+      "title": "Vernix Caseosa",
+      "baby_development": "Baby develops a waxy coating to protect the skin",
+      "baby_size": "152mm",
+      "baby_weight": "0g",
+      "milestones": ["Vernix caseosa develops", "Baby practices breathing", "Hair continues growing"],
+      "tips": ["Continue healthy diet", "Stay active", "Prepare for third trimester"],
+      "health_focus": ["Skin protection", "Respiratory development", "Continued growth"],
+      "risk_factors": ["Skin problems", "Breathing issues", "Growth restrictions"]
+    },
+    "20": {
+      "week": 20,
+      "title": "Halfway Point",
+      "baby_development": "You're halfway through pregnancy! Baby is about 10 inches long",
+      "baby_size": "165mm",
+      "baby_weight": "0g",
+      "milestones": ["Halfway point reached", "Anatomy scan", "Baby can hear clearly"],
+      "tips": ["Celebrate milestone", "Schedule anatomy scan", "Start planning birth"],
+      "health_focus": ["Mid-pregnancy assessment", "Birth planning", "Continued care"],
+      "risk_factors": ["Mid-pregnancy complications", "Anatomy scan issues", "Development problems"]
+    },
+    "21": {
+      "week": 21,
+      "title": "Regular Sleep Cycles",
+      "baby_development": "Baby develops regular sleep and wake cycles",
+      "baby_size": "178mm",
+      "baby_weight": "0g",
+      "milestones": ["Sleep cycles develop", "Baby responds to light", "Movement patterns form"],
+      "tips": ["Establish routines", "Monitor movement", "Continue healthy habits"],
+      "health_focus": ["Sleep patterns", "Movement tracking", "Routine establishment"],
+      "risk_factors": ["Sleep disturbances", "Movement concerns", "Development issues"]
+    },
+    "22": {
+      "week": 22,
+      "title": "Sense of Balance",
+      "baby_development": "Baby develops a sense of balance and spatial awareness",
+      "baby_size": "190mm",
+      "baby_weight": "0g",
+      "milestones": ["Balance development", "Spatial awareness", "Baby can hiccup"],
+      "tips": ["Continue gentle exercise", "Monitor movement", "Stay active"],
+      "health_focus": ["Balance activities", "Movement tracking", "Physical activity"],
+      "risk_factors": ["Balance problems", "Movement issues", "Development delays"]
+    },
+    "23": {
+      "week": 23,
+      "title": "Rapid Brain Growth",
+      "baby_development": "Baby's brain is growing rapidly, developing billions of neurons",
+      "baby_size": "201mm",
+      "baby_weight": "0g",
+      "milestones": ["Rapid brain growth", "Neuron development", "Memory formation begins"],
+      "tips": ["Eat brain-healthy foods", "Continue mental stimulation", "Stay active"],
+      "health_focus": ["Brain development", "Mental stimulation", "Continued growth"],
+      "risk_factors": ["Brain development issues", "Cognitive delays", "Neurological problems"]
+    },
+    "24": {
+      "week": 24,
+      "title": "Viability Milestone",
+      "baby_development": "Baby reaches viability - could survive outside the womb with medical help",
+      "baby_size": "213mm",
+      "baby_weight": "0g",
+      "milestones": ["Viability reached", "Lungs develop surfactant", "Baby practices breathing"],
+      "tips": ["Celebrate viability", "Continue healthy habits", "Plan for preterm care if needed"],
+      "health_focus": ["Lung development", "Respiratory health", "Preterm preparation"],
+      "risk_factors": ["Preterm birth", "Lung problems", "Respiratory issues"]
+    },
+    "25": {
+      "week": 25,
+      "title": "Responsive Baby",
+      "baby_development": "Baby responds to touch and can feel pain",
+      "baby_size": "223mm",
+      "baby_weight": "0g",
+      "milestones": ["Touch sensitivity", "Pain perception", "Baby responds to stimuli"],
+      "tips": ["Gentle touch", "Avoid loud noises", "Continue bonding activities"],
+      "health_focus": ["Sensory development", "Gentle stimulation", "Bonding activities"],
+      "risk_factors": ["Sensory issues", "Pain sensitivity", "Development problems"]
+    },
+    "26": {
+      "week": 26,
+      "title": "Eye Development",
+      "baby_development": "Baby's eyes are developing, can open and close them",
+      "baby_size": "233mm",
+      "baby_weight": "0g",
+      "milestones": ["Eyes can open", "Vision development", "Baby responds to light"],
+      "tips": ["Expose to gentle light", "Continue healthy diet", "Monitor movement"],
+      "health_focus": ["Vision development", "Light exposure", "Continued care"],
+      "risk_factors": ["Vision problems", "Eye development issues", "Sensory problems"]
+    },
+    "27": {
+      "week": 27,
+      "title": "Third Trimester Begins",
+      "baby_development": "Welcome to the third trimester! Baby is growing rapidly",
+      "baby_size": "242mm",
+      "baby_weight": "0g",
+      "milestones": ["Third trimester begins", "Rapid growth period", "Brain development continues"],
+      "tips": ["Prepare for final stretch", "Continue healthy habits", "Plan for birth"],
+      "health_focus": ["Final trimester preparation", "Birth planning", "Continued care"],
+      "risk_factors": ["Third trimester complications", "Preterm labor", "Development issues"]
+    },
+    "28": {
+      "week": 28,
+      "title": "Brain Waves",
+      "baby_development": "Baby's brain shows REM sleep patterns, indicating dreaming",
+      "baby_size": "250mm",
+      "baby_weight": "0g",
+      "milestones": ["REM sleep patterns", "Dreaming begins", "Brain wave activity"],
+      "tips": ["Monitor sleep patterns", "Continue healthy diet", "Stay active"],
+      "health_focus": ["Sleep patterns", "Brain development", "Continued growth"],
+      "risk_factors": ["Sleep disturbances", "Brain development issues", "Neurological problems"]
+    },
+    "29": {
+      "week": 29,
+      "title": "Growing Lungs",
+      "baby_development": "Baby's lungs are maturing, producing more surfactant",
+      "baby_size": "258mm",
+      "baby_weight": "0g",
+      "milestones": ["Lung maturation", "Surfactant production", "Breathing practice"],
+      "tips": ["Continue healthy habits", "Monitor breathing", "Stay active"],
+      "health_focus": ["Respiratory health", "Lung development", "Continued care"],
+      "risk_factors": ["Lung problems", "Respiratory issues", "Preterm complications"]
+    },
+    "30": {
+      "week": 30,
+      "title": "Weight Gain",
+      "baby_development": "Baby is gaining weight rapidly, about half a pound per week",
+      "baby_size": "266mm",
+      "baby_weight": "0g",
+      "milestones": ["Rapid weight gain", "Fat development", "Baby fills out"],
+      "tips": ["Eat nutrient-rich foods", "Monitor weight gain", "Continue exercise"],
+      "health_focus": ["Nutrient intake", "Weight management", "Physical activity"],
+      "risk_factors": ["Weight gain issues", "Nutritional problems", "Growth restrictions"]
+    },
+    "31": {
+      "week": 31,
+      "title": "Five Senses",
+      "baby_development": "All five senses are developed and functional",
+      "baby_size": "274mm",
+      "baby_weight": "0g",
+      "milestones": ["All senses developed", "Baby can taste", "Hearing is acute"],
+      "tips": ["Stimulate all senses", "Continue bonding activities", "Monitor development"],
+      "health_focus": ["Sensory development", "Bonding activities", "Development monitoring"],
+      "risk_factors": ["Sensory issues", "Development delays", "Bonding problems"]
+    },
+    "32": {
+      "week": 32,
+      "title": "Practice Breathing",
+      "baby_development": "Baby practices breathing movements regularly",
+      "baby_size": "281mm",
+      "baby_weight": "0g",
+      "milestones": ["Regular breathing practice", "Lung development", "Respiratory preparation"],
+      "tips": ["Monitor movement", "Continue healthy habits", "Prepare for birth"],
+      "health_focus": ["Respiratory health", "Movement tracking", "Birth preparation"],
+      "risk_factors": ["Breathing problems", "Respiratory issues", "Development delays"]
+    },
+    "33": {
+      "week": 33,
+      "title": "Immune System",
+      "baby_development": "Baby's immune system is developing, receiving antibodies from mother",
+      "baby_size": "287mm",
+      "baby_weight": "0g",
+      "milestones": ["Immune system development", "Antibody transfer", "Disease protection"],
+      "tips": ["Stay healthy", "Continue prenatal care", "Avoid illness"],
+      "health_focus": ["Immune health", "Disease prevention", "Continued care"],
+      "risk_factors": ["Immune problems", "Infection risk", "Development issues"]
+    },
+    "34": {
+      "week": 34,
+      "title": "Central Nervous System",
+      "baby_development": "Baby's nervous system is maturing rapidly",
+      "baby_size": "293mm",
+      "baby_weight": "0g",
+      "milestones": ["Nervous system maturation", "Brain development", "Coordination improvement"],
+      "tips": ["Continue mental stimulation", "Monitor development", "Stay active"],
+      "health_focus": ["Neurological development", "Mental stimulation", "Continued growth"],
+      "risk_factors": ["Neurological problems", "Development delays", "Coordination issues"]
+    },
+    "35": {
+      "week": 35,
+      "title": "Lung Maturity",
+      "baby_development": "Baby's lungs are nearly mature, ready for breathing outside the womb",
+      "baby_size": "298mm",
+      "baby_weight": "0g",
+      "milestones": ["Lung maturity", "Breathing readiness", "Birth preparation"],
+      "tips": ["Final birth preparations", "Continue healthy habits", "Monitor signs of labor"],
+      "health_focus": ["Respiratory readiness", "Birth preparation", "Labor monitoring"],
+      "risk_factors": ["Lung problems", "Respiratory issues", "Labor complications"]
+    },
+    "36": {
+      "week": 36,
+      "title": "Full Term Approaches",
+      "baby_development": "Baby is considered early term, most organs are fully developed",
+      "baby_size": "304mm",
+      "baby_weight": "0g",
+      "milestones": ["Early term reached", "Organ development complete", "Birth preparation"],
+      "tips": ["Final preparations", "Pack hospital bag", "Monitor labor signs"],
+      "health_focus": ["Final preparations", "Labor monitoring", "Birth readiness"],
+      "risk_factors": ["Late pregnancy complications", "Labor issues", "Birth complications"]
+    },
+    "37": {
+      "week": 37,
+      "title": "Full Term",
+      "baby_development": "Baby is now considered full term and ready for birth",
+      "baby_size": "310mm",
+      "baby_weight": "0g",
+      "milestones": ["Full term reached", "Birth readiness", "All systems developed"],
+      "tips": ["Monitor labor signs", "Final preparations", "Stay calm and ready"],
+      "health_focus": ["Labor monitoring", "Birth readiness", "Emotional preparation"],
+      "risk_factors": ["Labor complications", "Birth issues", "Post-term risks"]
+    },
+    "38": {
+      "week": 38,
+      "title": "Ready for Birth",
+      "baby_development": "Baby is fully developed and ready for birth",
+      "baby_size": "315mm",
+      "baby_weight": "0g",
+      "milestones": ["Birth readiness", "Full development", "Labor can begin"],
+      "tips": ["Watch for labor signs", "Stay calm", "Contact doctor if needed"],
+      "health_focus": ["Labor monitoring", "Birth preparation", "Medical contact"],
+      "risk_factors": ["Labor complications", "Birth issues", "Post-term risks"]
+    },
+    "39": {
+      "week": 39,
+      "title": "Any Day Now",
+      "baby_development": "Baby could arrive any day, all systems are go",
+      "baby_size": "320mm",
+      "baby_weight": "0g",
+      "milestones": ["Imminent birth", "All systems ready", "Labor expected"],
+      "tips": ["Stay prepared", "Monitor contractions", "Contact doctor immediately"],
+      "health_focus": ["Labor monitoring", "Birth preparation", "Medical readiness"],
+      "risk_factors": ["Labor complications", "Birth issues", "Emergency situations"]
+    },
+    "40": {
+      "week": 40,
+      "title": "Due Date",
+      "baby_development": "Welcome to your due date! Baby is fully developed and ready",
+      "baby_size": "325mm",
+      "baby_weight": "0g",
+      "milestones": ["Due date reached", "Full development", "Birth expected"],
+      "tips": ["Stay calm and patient", "Monitor all signs", "Contact doctor regularly"],
+      "health_focus": ["Labor monitoring", "Birth preparation", "Medical supervision"],
+      "risk_factors": ["Post-term pregnancy", "Labor complications", "Birth emergencies"]
+    }
+  },
+  "trimester_info": {
+    "first": {
+      "weeks": "1-12",
+      "focus": "Foundation and development",
+      "risks": "Miscarriage, birth defects",
+      "care": "Prenatal vitamins, healthy diet, avoiding harmful substances"
+    },
+    "second": {
+      "weeks": "13-26",
+      "focus": "Growth and development",
+      "risks": "Gestational diabetes, pre-eclampsia",
+      "care": "Regular check-ups, exercise, balanced nutrition"
+    },
+    "third": {
+      "weeks": "27-40",
+      "focus": "Preparation for birth",
+      "risks": "Preterm labor, complications",
+      "care": "Labor monitoring, birth preparation, medical supervision"
+    }
+  },
+  "health_tips": {
+    "nutrition": [
+      "Take prenatal vitamins daily",
+      "Eat a balanced diet rich in fruits, vegetables, and lean proteins",
+      "Stay hydrated with 8-10 glasses of water daily",
+      "Include folic acid, iron, and calcium-rich foods",
+      "Avoid raw fish, unpasteurized dairy, and excessive caffeine"
+    ],
+    "exercise": [
+      "Engage in moderate exercise for 30 minutes most days",
+      "Practice prenatal yoga or swimming",
+      "Avoid high-impact activities and contact sports",
+      "Listen to your body and rest when needed",
+      "Consult your doctor before starting any new exercise routine"
+    ],
+    "mental_health": [
+      "Practice stress-reduction techniques like meditation",
+      "Get adequate sleep (7-9 hours per night)",
+      "Stay connected with supportive friends and family",
+      "Consider joining a pregnancy support group",
+      "Seek professional help if experiencing anxiety or depression"
+    ],
+    "prenatal_care": [
+      "Attend all scheduled prenatal appointments",
+      "Keep track of your symptoms and concerns",
+      "Ask questions and voice any worries",
+      "Follow your doctor's recommendations",
+      "Know the signs of preterm labor and when to call your doctor"
+    ]
+  }
+}

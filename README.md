@@ -489,7 +489,6 @@ python migrate_add_moderation_fields.py
 - **Documentation**: Comprehensive guides available
 - **Issue Tracking**: GitHub issues for bug reports
 - **Community**: Developer community forums
-- **Direct Support**: Technical team contact
 
 ### **User Support**
 - **In-App Help**: Built-in assistance features
@@ -500,48 +499,5 @@ python migrate_add_moderation_fields.py
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Authors
-
-- **Development Team**: SymbiHelp Development Team
-- **Medical Advisors**: Healthcare professionals and experts
-- **Contributors**: Open source community contributors
-
-## 🙏 Acknowledgments
-
-- **Medical Professionals**: Clinical expertise and validation
-- **Open Source Community**: Libraries, frameworks, and tools
-- **Beta Testers**: User feedback and testing
-- **Research Community**: Maternal health research and data
-- **Development Team**: Continuous improvement and innovation
-
-## 🔄 Updates & Roadmap
-
-### **Current Version**: 1.0.0
-### **Last Updated**: December 2024
-
-### **Recent Updates**
-- Comprehensive role-based access control
-- Advanced health risk prediction with ML
-- AI-powered chatbot integration (Groq)
-- Appointment scheduling system with reschedule workflow
-- Gamification and progress tracking
-- Real-time health monitoring
-- Community forum with moderation
-- Nurse credential verification
-- Password change functionality
-- Mobile-responsive UI improvements
-
-### **Future Roadmap**
-- Enhanced AI capabilities
-- Advanced analytics and reporting
-- Integration with wearable devices
-- Multi-language support
-- Telemedicine features
-- Advanced health insights
-- Push notifications
-- Video consultation features
-
----
 
 **SymbiHelp** - Empowering expectant mothers through technology and healthcare innovation.

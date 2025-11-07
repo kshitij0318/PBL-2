@@ -1,18 +1,25 @@
 # Environment Variables Template for SymbiHelp Backend
 # Copy this file to .env and fill in your actual values
+# DO NOT COMMIT .env TO GIT - It contains sensitive information
 
 # Database Configuration
-DATABASE_URL=postgresql://username:password@host:port/database_name
+# Format: postgresql://username:password@host:port/database_name?sslmode=disable
+# For production: Use your production database URL
+DATABASE_URL=postgresql://username:password@host:port/database_name?sslmode=disable
 
 # JWT Secret Key (generate a secure random string)
+# Use a strong, random string for production
 JWT_SECRET_KEY=your_jwt_secret_key_here
 
-# Groq API Key (required for AI functionality)
+# Groq API Key (optional - for AI functionality)
 # Get your API key from https://console.groq.com/
+# If not provided, AI features will be disabled
 GROQ_API_KEY=your_groq_api_key_here
 
 # Flask Environment
+# Options: development or production
 FLASK_ENV=production
 
 # Optional: Logging Level
+# Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
 LOG_LEVEL=INFO

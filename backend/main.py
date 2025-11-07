@@ -43,12 +43,15 @@ if not DATABASE_URL:
     missing_vars.append('DATABASE_URL')
 if not JWT_SECRET_KEY:
     missing_vars.append('JWT_SECRET_KEY')
+
+# GROQ_API_KEY is optional - app can run without it (AI features will be disabled)
 if not GROQ_API_KEY:
-    missing_vars.append('GROQ_API_KEY')
     logger.warning("GROQ_API_KEY not found in environment. AI features will be disabled.")
+
+# Only raise exception for required variables
 if missing_vars:
-    logger.error(f"Missing environment variables: {', '.join(missing_vars)}")
-    raise Exception(f"Missing environment variables: {', '.join(missing_vars)}")
+    logger.error(f"Missing required environment variables: {', '.join(missing_vars)}")
+    raise Exception(f"Missing required environment variables: {', '.join(missing_vars)}")
 
 # Configure Groq AI provider
 groq_client = None

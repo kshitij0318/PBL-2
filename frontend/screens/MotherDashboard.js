@@ -456,6 +456,10 @@ export default function MotherDashboard({ navigation }) {
         return;
       }
 
+      // Add timeout to fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       const response = await fetch(`${API_URL}/update-consent`, {
         method: 'POST',
         headers: {
@@ -463,26 +467,48 @@ export default function MotherDashboard({ navigation }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ consent: value }),
+        signal: controller.signal,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status === 'success') {
-          setConsentShared(value);
-          saveConsentToStorage(value);
-          Alert.alert(
-            'Success', 
-            value ? 'Your health data is now shared with nurses for better care.' : 'Your health data is now private.'
-          );
-        } else {
-          Alert.alert('Error', data.message || 'Failed to update consent');
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        // Try to get error message from response
+        let errorMessage = `HTTP ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || errorMessage;
         }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        setConsentShared(value);
+        saveConsentToStorage(value);
+        Alert.alert(
+          'Success', 
+          value ? 'Your health data is now shared with nurses for better care.' : 'Your health data is now private.'
+        );
       } else {
-        throw new Error(`HTTP ${response.status}`);
+        Alert.alert('Error', data.message || 'Failed to update consent');
       }
     } catch (error) {
       console.error('Error updating consent:', error);
-      Alert.alert('Error', 'Failed to update consent. Please try again.');
+      let errorMessage = 'Failed to update consent. Please try again.';
+      
+      if (error.name === 'AbortError') {
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (error.message?.includes('Network request failed')) {
+        errorMessage = `Cannot connect to server. Please check your internet connection and ensure the backend is running at ${API_URL}`;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Error', errorMessage);
     }
   };
 

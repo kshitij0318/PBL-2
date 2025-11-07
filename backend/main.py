@@ -77,7 +77,7 @@ def handle_options():
         if IS_DEVELOPMENT:
             response.headers.add('Access-Control-Allow-Origin', 'http://localhost:8081')
         else:
-            response.headers.add('Access-Control-Allow-Origin', 'https://your-frontend-domain.com')
+            response.headers.add('Access-Control-Allow-Origin', '*')  # Allow all origins in production
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
         response.headers.add('Access-Control-Allow-Credentials', 'true')
@@ -96,10 +96,10 @@ if IS_DEVELOPMENT:
         }
     })
 else:
-    # In production, restrict to your frontend domain
+    # In production, allow all origins (or specify your frontend domains)
     CORS(app, resources={
         r"/*": {
-            "origins": ["https://your-frontend-domain.com"],  # Replace with your actual frontend domain
+            "origins": ["*"],  # Allow all origins - update to specific domains if needed
             "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
             "supports_credentials": True,

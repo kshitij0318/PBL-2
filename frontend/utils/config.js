@@ -7,28 +7,15 @@ const isDevelopment = __DEV__;
 
 // Function to resolve host based on environment
 const resolveHost = () => {
-  if (isDevelopment) {
-    // For iOS Simulator and Android Emulator, localhost works
-    // For physical devices, you may need to use your machine's IP address
-    // You can set EXPO_PUBLIC_API_URL in .env or use localhost for simulators
-    const customApiUrl = Constants.expoConfig?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL;
-    if (customApiUrl) {
-      return customApiUrl;
-    }
-    
-    // Default to localhost for simulators/emulators
-    // For physical devices, replace with your machine's IP (e.g., 'http://192.168.1.100:5000')
-    if (Platform.OS === 'web') {
-      return 'http://localhost:5000';
-    }
-    // For iOS Simulator, localhost works
-    // For Android Emulator, use 10.0.2.2 instead of localhost
-    if (Platform.OS === 'android') {
-      return 'http://10.0.2.2:5000';  // Android emulator uses 10.0.2.2 for host machine
-    }
-    return 'http://localhost:5000';  // iOS Simulator
+  // Check for custom API URL first (allows override for local development)
+  const customApiUrl = Constants.expoConfig?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL;
+  if (customApiUrl) {
+    return customApiUrl;
   }
-  return 'https://symbihelp.onrender.com';  // Production
+  
+  // Default to production backend URL
+  // For local development, set EXPO_PUBLIC_API_URL in .env file
+  return 'https://symbihelp.onrender.com';
 };
 
 const resolvedHost = resolveHost();

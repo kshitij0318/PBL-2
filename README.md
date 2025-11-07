@@ -222,9 +222,9 @@ The application features dynamic navigation based on user roles:
    # Install dependencies
    npm install
    
-   # Create .env file with API URL
-   echo "API_URL=http://localhost:5000" > .env
-   echo "EXPO_PUBLIC_API_URL=http://localhost:5000" >> .env
+   # Create .env file with API URL (optional - defaults to production)
+   # For local development, uncomment and set to your local backend:
+   # echo "EXPO_PUBLIC_API_URL=http://localhost:5000" > .env
    
    # Start development server
    npm start
@@ -246,8 +246,9 @@ The application features dynamic navigation based on user roles:
 
 #### **Frontend (.env)**
 ```bash
-API_URL=http://localhost:5000
-EXPO_PUBLIC_API_URL=http://localhost:5000
+# Optional: Override API URL for local development
+# Defaults to https://symbihelp.onrender.com if not set
+# EXPO_PUBLIC_API_URL=http://localhost:5000
 ```
 
 #### **Backend (.env)**

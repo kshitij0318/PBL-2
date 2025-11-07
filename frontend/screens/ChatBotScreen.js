@@ -10,8 +10,8 @@ import {
   Platform,
   ActivityIndicator,
   Keyboard,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import { useFocusEffect } from '@react-navigation/native';

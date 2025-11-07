@@ -9,9 +9,9 @@ import {
   ScrollView, 
   Modal, 
   TextInput,
-  ActivityIndicator,
-  SafeAreaView
+  ActivityIndicator
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, Agenda } from 'react-native-calendars';
 import * as CalendarAPI from 'expo-calendar';
 import { Ionicons } from '@expo/vector-icons';

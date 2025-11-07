@@ -8,7 +8,8 @@ import { API_URL, apiRequest } from '../utils/config';
 import { useAuth } from '../utils/AuthContext';
 import { useRoleNotifications } from '../utils/NotificationContext';
 import { Ionicons } from '@expo/vector-icons';
-import { Dimensions, Platform, StatusBar, SafeAreaView } from 'react-native';
+import { Dimensions, Platform, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const REFRESH_INTERVAL = 30000;
 const { width } = Dimensions.get('window');

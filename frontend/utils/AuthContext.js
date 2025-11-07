@@ -36,6 +36,10 @@ export const AuthProvider = ({ children }) => {
   const signIn = async (email, password) => {
     setLoading(true);
     try {
+      // Add timeout to fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
@@ -45,7 +49,14 @@ export const AuthProvider = ({ children }) => {
           email: email,
           password: password,
         }),
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
+
+      if (!response.ok && response.status !== 401 && response.status !== 400) {
+        throw new Error(`Server error: ${response.status}`);
+      }
 
       const data = await response.json();
 
@@ -78,9 +89,19 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Login error:', error);
+      let errorMessage = 'Network error. Please check your connection and try again.';
+      
+      if (error.name === 'AbortError') {
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (error.message?.includes('Network request failed')) {
+        errorMessage = `Cannot connect to server at ${API_URL}. Please ensure the backend is running and accessible.`;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       return { 
         success: false, 
-        error: 'Network error. Please check your connection and try again.'
+        error: errorMessage
       };
     } finally {
       setLoading(false);

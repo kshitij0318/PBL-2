@@ -3,7 +3,6 @@ module.exports = function (api) {
     return {
       presets: ['babel-preset-expo'], // Use the Expo Babel preset
       plugins: [
-        'react-native-reanimated/plugin',
         [
           'module:react-native-dotenv', // Add react-native-dotenv plugin
           {
@@ -15,6 +14,7 @@ module.exports = function (api) {
             allowUndefined: true,
           },
         ],
+        'react-native-reanimated/plugin', // Must be last
       ],
     };
   };

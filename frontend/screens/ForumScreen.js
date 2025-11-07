@@ -6,7 +6,6 @@ import {
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   Dimensions,
@@ -15,6 +14,7 @@ import {
   Alert,
   RefreshControl
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import io from 'socket.io-client';
 import { API_URL, apiRequest } from '../utils/config';

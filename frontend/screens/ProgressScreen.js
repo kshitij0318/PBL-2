@@ -1,6 +1,7 @@
 // src/screens/ProgressScreen.js
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView, ActivityIndicator, StatusBar, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, StatusBar, TouchableOpacity, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { getHistory } from '../utils/ProgressManager';
 import { Ionicons } from '@expo/vector-icons';

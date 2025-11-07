@@ -72,6 +72,42 @@ try:
 except Exception:
     pass
 
+# Function to create default admin user
+def create_default_admin():
+    """Create default admin user if it doesn't exist"""
+    try:
+        admin_email = 'admin@gmail.com'
+        admin_password = 'admin123'
+        admin_full_name = 'System Administrator'
+        
+        # Check if admin user already exists
+        existing_admin = User.query.filter_by(email=admin_email).first()
+        if existing_admin:
+            logger.info(f"Default admin user already exists: {admin_email}")
+            return
+        
+        # Hash the password
+        hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        # Create admin user
+        admin_user = User(
+            email=admin_email,
+            password=hashed_password,
+            full_name=admin_full_name,
+            role='admin',
+            is_admin=True
+        )
+        
+        db.session.add(admin_user)
+        db.session.commit()
+        logger.info(f"Default admin user created successfully: {admin_email}")
+    except IntegrityError:
+        db.session.rollback()
+        logger.info("Default admin user already exists (integrity constraint)")
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error creating default admin user: {str(e)}")
+
 # Handle OPTIONS requests for CORS preflight
 @app.before_request
 def handle_options():
@@ -422,6 +458,10 @@ def init_database():
         try:
             db.create_all()
             logger.info("Database tables created successfully")
+            
+            # Create default admin user if it doesn't exist
+            create_default_admin()
+            
             # Ensure new moderation columns and forum tables exist (idempotent)
             try:
                 with db.engine.connect() as conn:

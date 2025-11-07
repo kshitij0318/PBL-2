@@ -976,6 +976,10 @@ export default function PregnancyTimeline({ navigation }) {
   }
 
   if (timelineError) {
+    // Check if error is related to due date
+    const isDueDateError = timelineError.toLowerCase().includes('due date') || 
+                           timelineError.toLowerCase().includes('set your due date');
+    
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.lightBackground }]}>
         <View style={styles.errorContainer}>
@@ -986,12 +990,31 @@ export default function PregnancyTimeline({ navigation }) {
           <Text style={[styles.errorText, { color: theme.text }]}>
             {timelineError}
           </Text>
-          <TouchableOpacity
-            style={[styles.retryButton, { backgroundColor: theme.primary }]}
-            onPress={loadTimelineData}
-          >
-            <Text style={styles.retryButtonText}>Try Again</Text>
-          </TouchableOpacity>
+          
+          {isDueDateError ? (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.primaryButton, { backgroundColor: theme.primary }]}
+                onPress={() => navigation.navigate('MotherDashboard')}
+              >
+                <Ionicons name="calendar-outline" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
+                <Text style={styles.primaryButtonText}>Set Due Date</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.secondaryButton, { borderColor: theme.primary }]}
+                onPress={loadTimelineData}
+              >
+                <Text style={[styles.secondaryButtonText, { color: theme.primary }]}>Try Again</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[styles.retryButton, { backgroundColor: theme.primary }]}
+              onPress={loadTimelineData}
+            >
+              <Text style={styles.retryButtonText}>Try Again</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </SafeAreaView>
     );
@@ -1142,6 +1165,37 @@ const styles = StyleSheet.create({
   },
   retryButtonText: {
     color: themeColors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+    gap: 12,
+  },
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 8,
+    minWidth: 200,
+  },
+  primaryButtonText: {
+    color: themeColors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 2,
+    minWidth: 200,
+    alignItems: 'center',
+  },
+  secondaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
   },
